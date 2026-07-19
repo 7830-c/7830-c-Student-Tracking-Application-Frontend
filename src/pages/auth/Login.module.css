@@ -1,0 +1,188 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.card {
+  width: 420px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.card h1 {
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.card p {
+  color: #6b7280;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.linkedinBtn {
+  width: 100%;
+  padding: 14px;
+  background: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.3s;
+}
+
+.linkedinBtn:hover {
+  background: #004182;
+}
+
+.card input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 20px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.card input:focus {
+  border-color: #2563eb;
+}
+
+.linkedinBtn {
+  width: 100%;
+  padding: 14px;
+  background: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.loginBtn:hover {
+  background: #1d4ed8;
+}
+
+.card a {
+  display: inline-block;
+  margin-top: 20px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+.inputBox {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.inputBox input {
+  width: 100%;
+  padding: 14px 14px 14px 45px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.inputBox input:focus {
+  border-color: #2563eb;
+}
+.loginWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  max-width: 1100px;
+  width: 100%;
+}
+
+.leftSide {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.image {
+  width: 100%;
+  max-width: 500px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+@media (max-width: 900px) {
+  .loginWrapper {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .leftSide {
+    display: none;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+  }
+}
+.eye {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.eye:hover {
+  color: #2563eb;
+}
+
+.inputBox input {
+  padding-right: 45px;
+}
