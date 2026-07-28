@@ -1,0 +1,85 @@
+.page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.card h1 {
+  color: #1e3a8a;
+  margin-bottom: 30px;
+}
+
+.resultBox {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 30px;
+}
+
+.resultBox h2 {
+  margin-bottom: 15px;
+}
+
+.score {
+  font-size: 40px;
+  font-weight: bold;
+  color: #2563eb;
+  margin: 15px 0;
+}
+
+.percentage {
+  font-size: 26px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.qualified {
+  margin-top: 20px;
+  background: #16a34a;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.notQualified {
+  margin-top: 20px;
+  background: #dc2626;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.note {
+  margin: 30px 0;
+  line-height: 1.8;
+  color: #4b5563;
+}
+
+.button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.button:hover {
+  background: #1d4ed8;
+}

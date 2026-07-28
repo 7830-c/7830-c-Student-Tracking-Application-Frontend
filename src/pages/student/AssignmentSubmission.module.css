@@ -1,0 +1,93 @@
+.page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 800px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card h1 {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 35px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.group input,
+.group textarea {
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+.group input:focus,
+.group textarea:focus {
+  border-color: #2563eb;
+}
+
+.group textarea {
+  resize: vertical;
+}
+
+.submitBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submitBtn:hover {
+  background: #1d4ed8;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.back:hover {
+  text-decoration: underline;
+}

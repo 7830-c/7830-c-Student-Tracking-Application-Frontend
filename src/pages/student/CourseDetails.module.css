@@ -1,0 +1,97 @@
+.courseDetailsPage {
+  min-height: 100vh;
+  background: #f4f7fb;
+  padding: 60px 30px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: #fff;
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.container h1 {
+  color: #1e3a8a;
+  margin-bottom: 15px;
+  font-size: 38px;
+}
+
+.description {
+  color: #6b7280;
+  line-height: 1.8;
+  margin-bottom: 35px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.infoGrid div {
+  background: #f8fafc;
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.infoGrid h3 {
+  color: #374151;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.infoGrid p {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.section {
+  margin-bottom: 35px;
+}
+
+.section h2 {
+  color: #1e3a8a;
+  margin-bottom: 15px;
+}
+
+.section ul {
+  padding-left: 20px;
+  line-height: 2;
+  color: #4b5563;
+}
+
+.applyBtn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.applyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 25px;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .container h1 {
+    font-size: 30px;
+  }
+}

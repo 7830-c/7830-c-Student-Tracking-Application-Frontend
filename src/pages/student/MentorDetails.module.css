@@ -1,0 +1,70 @@
+.page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.profile {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.profile img {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #2563eb;
+  margin-bottom: 20px;
+}
+
+.profile h1 {
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.profile p {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.infoBox {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.infoBox h3 {
+  color: #2563eb;
+  margin-bottom: 10px;
+}
+
+.infoBox p,
+.infoBox a {
+  color: #374151;
+  text-decoration: none;
+}
+
+.infoBox a:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}

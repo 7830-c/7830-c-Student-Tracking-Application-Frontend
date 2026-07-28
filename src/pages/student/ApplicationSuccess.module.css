@@ -1,0 +1,80 @@
+.successPage {
+  min-height: 100vh;
+  background: #f4f7fc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.successCard {
+  max-width: 700px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 50px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.icon {
+  font-size: 70px;
+  margin-bottom: 20px;
+}
+
+.successCard h1 {
+  color: #15803d;
+  margin-bottom: 15px;
+  font-size: 34px;
+}
+
+.successCard p {
+  color: #6b7280;
+  line-height: 1.8;
+  margin-bottom: 30px;
+}
+
+.infoBox {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 25px;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.infoBox h3 {
+  color: #1e3a8a;
+  margin-bottom: 15px;
+}
+
+.infoBox ul {
+  padding-left: 20px;
+  line-height: 2;
+  color: #4b5563;
+}
+
+.button {
+  display: inline-block;
+  text-decoration: none;
+  background: #2563eb;
+  color: white;
+  padding: 14px 30px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+  .successCard {
+    padding: 30px;
+  }
+
+  .successCard h1 {
+    font-size: 28px;
+  }
+}

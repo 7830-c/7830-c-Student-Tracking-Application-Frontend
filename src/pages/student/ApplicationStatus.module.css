@@ -1,0 +1,123 @@
+.statusPage {
+  min-height: 100vh;
+  background: #f4f7fc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.statusCard {
+  width: 100%;
+  max-width: 850px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.statusCard h1 {
+  color: #1e3a8a;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 35px;
+}
+
+.details {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 35px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.pending {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 35px;
+}
+
+.timeline div {
+  padding: 15px;
+  border-radius: 10px;
+  background: #f3f4f6;
+}
+
+.completed {
+  background: #dcfce7 !important;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.active {
+  background: #fef3c7 !important;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.button {
+  display: inline-block;
+  text-decoration: none;
+  background: #2563eb;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width:768px){
+
+  .statusCard{
+    padding:25px;
+  }
+
+  .row{
+    flex-direction:column;
+    gap:8px;
+    align-items:flex-start;
+  }
+
+}
+.examButton {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #16a34a;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  transition: 0.3s;
+}
+
+.examButton:hover {
+  background: #15803d;
+}

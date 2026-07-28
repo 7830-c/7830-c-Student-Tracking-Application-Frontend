@@ -1,11 +1,11 @@
 import styles from "./Navbar.module.css";
-import { FaLinkedin } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={styles.logo}>
-        Student Tracking
+        Sure ProEd
       </div>
 
       <ul className={styles.menu}>
@@ -15,10 +15,15 @@ function Navbar() {
         <li><a href="#contact">Contact</a></li>
       </ul>
 
-      <a href="/login" className={styles.loginBtn}>
-        <FaLinkedin />
-        <span>Login</span>
-      </a>
+      <div className={styles.buttons}>
+        <Link to="/signup" className={styles.signupBtn}>
+          Sign Up
+        </Link>
+
+        <Link to="/login" className={styles.loginBtn}>
+          Student Login
+        </Link>
+      </div>
     </nav>
   );
 }

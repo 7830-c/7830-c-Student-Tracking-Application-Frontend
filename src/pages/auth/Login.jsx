@@ -1,16 +1,9 @@
-import { useState } from "react";
-import styles from "./Login.module.css";
-import {
-  FaLinkedin,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaLinkedin } from "react-icons/fa";
 import heroImage from "../../assets/images/hero.svg";
+import styles from "./Login.module.css";
 
 function Login() {
-  const [showPassword, setShowPassword] = useState(false);
-
   return (
     <div className={styles.container}>
       <div className={styles.loginWrapper}>
@@ -19,45 +12,61 @@ function Login() {
         <div className={styles.leftSide}>
           <img
             src={heroImage}
-            alt="Student"
+            alt="Student Login"
             className={styles.image}
           />
         </div>
 
         {/* Right Side */}
         <div className={styles.card}>
-          <h1>Welcome Back</h1>
 
-          <p>
-            Sign in to continue to your Student Tracking Dashboard.
+          <h1>Student Login</h1>
+
+          <p className={styles.subtitle}>
+            Access is available only for students who have successfully
+            qualified the screening exam and have been assigned to an
+            internship cohort.
           </p>
 
           <button className={styles.linkedinBtn}>
             <FaLinkedin />
-            Continue with LinkedIn
+            <span>Continue with LinkedIn</span>
           </button>
 
-          <div className={styles.inputBox}>
-            <FaLock className={styles.icon} />
-
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Application Password"
-            />
-
-            <span
-              className={styles.eye}
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
+          <div className={styles.forgotPassword}>
+            <Link to="/forgot-password">
+              Forgot Password?
+            </Link>
           </div>
 
-          <button className={styles.loginBtn}>
-            Login
-          </button>
+          <div className={styles.infoBox}>
+            <h3>Who can login?</h3>
 
-          <a href="/">← Back to Home</a>
+            <ul>
+              <li>Qualified Screening Exam</li>
+              <li>Assigned to Internship Cohort</li>
+              <li>LinkedIn Account Connected</li>
+            </ul>
+          </div>
+
+          <p className={styles.note}>
+            New student?
+          </p>
+
+          <Link
+            to="/signup"
+            className={styles.signupLink}
+          >
+            Create Student Account
+          </Link>
+
+          <Link
+            to="/"
+            className={styles.homeLink}
+          >
+            ← Back to Home
+          </Link>
+
         </div>
 
       </div>
