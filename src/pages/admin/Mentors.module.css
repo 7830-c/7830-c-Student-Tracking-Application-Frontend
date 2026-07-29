@@ -1,0 +1,93 @@
+.page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  padding: 40px 20px;
+}
+
+.card {
+  max-width: 1200px;
+  margin: auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 35px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  color: #1e3a8a;
+}
+
+.addBtn {
+  text-decoration: none;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.addBtn:hover {
+  background: #1d4ed8;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.table th,
+.table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.status {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+}
+
+.actions a {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.actions a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
+}

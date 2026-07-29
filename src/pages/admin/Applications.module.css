@@ -1,0 +1,96 @@
+.container {
+  padding: 40px;
+  background: #f4f7fb;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 32px;
+  color: #1f2937;
+}
+
+.header p {
+  margin-top: 8px;
+  color: #6b7280;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table th {
+  background: #2563eb;
+  color: white;
+  padding: 16px;
+  text-align: left;
+}
+
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table tr:hover {
+  background: #f9fafb;
+}
+
+.pending {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.approved {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.rejected {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions a {
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.actions a:nth-child(1) {
+  background: #2563eb;
+  color: white;
+}
+
+.actions a:nth-child(2) {
+  background: #16a34a;
+  color: white;
+}
+
+.actions a:nth-child(3) {
+  background: #dc2626;
+  color: white;
+}
+
+.actions a:hover {
+  opacity: 0.9;
+}

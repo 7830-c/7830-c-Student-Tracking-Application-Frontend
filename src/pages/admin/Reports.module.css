@@ -1,0 +1,66 @@
+.container {
+  min-height: 100vh;
+  background: #f4f7fb;
+  padding: 40px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 34px;
+  color: #1f2937;
+}
+
+.header p {
+  margin-top: 10px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.card p {
+  color: #6b7280;
+  margin-bottom: 25px;
+  line-height: 1.7;
+}
+
+.card a {
+  display: inline-block;
+  text-decoration: none;
+  background: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.card a:hover {
+  background: #1d4ed8;
+}
