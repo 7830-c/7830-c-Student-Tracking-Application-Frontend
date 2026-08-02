@@ -1,79 +1,73 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./Assignments.module.css";
 
 function Assignments() {
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const assignments = [
-    {
-      id: 1,
-      title: "React Dashboard",
-      batch: "Java Full Stack - Batch A",
-      due: "05 Aug 2026",
-      submitted: "38 / 42",
-    },
-    {
-      id: 2,
-      title: "REST API Integration",
-      batch: "Java Full Stack - Batch A",
-      due: "10 Aug 2026",
-      submitted: "34 / 42",
-    },
-    {
-      id: 3,
-      title: "Authentication Module",
-      batch: "Java Full Stack - Batch A",
-      due: "15 Aug 2026",
-      submitted: "29 / 42",
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    const loadAssignments = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.ASSIGNMENTS.BASE);
+        if (isMounted) setAssignments(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        console.error("Failed to load mentor assignments:", err);
+        if (isMounted) setAssignments([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadAssignments();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className={styles.container}>
-
       <div className={styles.header}>
         <h1>Assignments</h1>
         <p>Review student submissions</p>
       </div>
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-
-          <thead>
-            <tr>
-              <th>Assignment</th>
-              <th>Batch</th>
-              <th>Due Date</th>
-              <th>Submitted</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {assignments.map((item) => (
-
-              <tr key={item.id}>
-
-                <td>{item.title}</td>
-                <td>{item.batch}</td>
-                <td>{item.due}</td>
-                <td>{item.submitted}</td>
-
-                <td>
-                  <Link to="/mentor/assignment-feedback">
-                    Review
-                  </Link>
-                </td>
-
+      {loading ? (
+        <p>Loading assignments from the database...</p>
+      ) : assignments.length === 0 ? (
+        <p>No assignments are available yet.</p>
+      ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Assignment</th>
+                <th>Cohort</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
+            </thead>
 
-            ))}
-
-          </tbody>
-
-        </table>
-      </div>
-
+            <tbody>
+              {assignments.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.title}</td>
+                  <td>{item.cohort?.name || item.cohort || "N/A"}</td>
+                  <td>{item.deadline || "N/A"}</td>
+                  <td>{item.status || "DRAFT"}</td>
+                  <td>
+                    <Link to="/mentor/assignment-feedback">Review</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

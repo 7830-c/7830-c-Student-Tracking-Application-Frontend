@@ -1,97 +1,91 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./CourseDetails.module.css";
 
 function CourseDetails() {
+  const { id } = useParams();
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadCourse = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.COURSES.BY_ID(id));
+        setCourse(response.data || null);
+      } catch (err) {
+        console.error("Failed to load course details:", err);
+        setError("Unable to load course details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadCourse();
+    }
+  }, [id]);
+
+  if (loading) return <div className={styles.page}><div className={styles.card}><h1>Course Details</h1><p>Loading course details...</p></div></div>;
+  if (error) return <div className={styles.page}><div className={styles.card}><h1>Course Details</h1><p style={{ color: "#b91c1c" }}>{error}</p></div></div>;
+  if (!course) return <div className={styles.page}><div className={styles.card}><h1>Course Details</h1><p>No course found.</p></div></div>;
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
         <div className={styles.header}>
           <h1>Course Details</h1>
-
-          <Link to="/admin/courses" className={styles.backBtn}>
-            ← Back
-          </Link>
+          <Link to="/admin/courses" className={styles.backBtn}>← Back</Link>
         </div>
 
         <div className={styles.infoGrid}>
-
           <div className={styles.item}>
             <h3>Course Name</h3>
-            <p>Java Full Stack Development</p>
+            <p>{course.name || "N/A"}</p>
+          </div>
+
+          <div className={styles.item}>
+            <h3>Code</h3>
+            <p>{course.code || "N/A"}</p>
+          </div>
+
+          <div className={styles.item}>
+            <h3>Domain</h3>
+            <p>{course.domain || "N/A"}</p>
           </div>
 
           <div className={styles.item}>
             <h3>Duration</h3>
-            <p>6 Months</p>
+            <p>{course.duration_weeks ? `${course.duration_weeks} Weeks` : "N/A"}</p>
           </div>
 
           <div className={styles.item}>
-            <h3>Mentor</h3>
-            <p>Ravi Kumar</p>
-          </div>
-
-          <div className={styles.item}>
-            <h3>Total Students</h3>
-            <p>120</p>
+            <h3>Difficulty</h3>
+            <p>{course.difficulty || "N/A"}</p>
           </div>
 
           <div className={styles.item}>
             <h3>Status</h3>
-            <p className={styles.active}>Active</p>
+            <p className={styles.active}>{course.status || "DRAFT"}</p>
           </div>
-
-          <div className={styles.item}>
-            <h3>Start Date</h3>
-            <p>01 August 2026</p>
-          </div>
-
         </div>
 
         <div className={styles.section}>
           <h2>Description</h2>
-
-          <p>
-            This course covers Java Programming, Spring Boot,
-            React JS, MySQL, REST APIs, Git, Deployment,
-            and complete Full Stack Development with
-            real-time projects.
-          </p>
+          <p>{course.description || "No description provided."}</p>
         </div>
 
         <div className={styles.section}>
-          <h2>Course Modules</h2>
-
-          <ul>
-            <li>Java Fundamentals</li>
-            <li>Advanced Java</li>
-            <li>Spring Boot</li>
-            <li>React JS</li>
-            <li>MySQL Database</li>
-            <li>REST API Development</li>
-            <li>Mini Project</li>
-            <li>Capstone Project</li>
-          </ul>
+          <h2>Prerequisites</h2>
+          <p>{course.prerequisites || "None specified."}</p>
         </div>
 
         <div className={styles.buttons}>
-
-          <Link
-            to="/admin/edit-course"
-            className={styles.editBtn}
-          >
-            Edit Course
-          </Link>
-
-          <Link
-            to="/admin/courses"
-            className={styles.cancelBtn}
-          >
-            Back to Courses
-          </Link>
-
+          <Link to={`/admin/edit-course/${course.id}`} className={styles.editBtn}>Edit Course</Link>
+          <Link to="/admin/courses" className={styles.cancelBtn}>Back to Courses</Link>
         </div>
-
       </div>
     </div>
   );

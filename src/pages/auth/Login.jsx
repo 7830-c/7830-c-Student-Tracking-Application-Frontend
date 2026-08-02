@@ -1,27 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaLinkedin } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { authService } from "../../services/authService";
+import { setAccessToken, setRefreshToken, setUserInfo, parseJwt } from "../../utils/tokenStorage";
 import heroImage from "../../assets/images/hero.svg";
 import styles from "./Login.module.css";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, updateUser } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Check for LinkedIn OAuth redirect tokens in URL query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const access = params.get("access");
+    const refresh = params.get("refresh");
+
+    if (access) {
+      setAccessToken(access);
+      if (refresh) setRefreshToken(refresh);
+      const decoded = parseJwt(access) || {};
+      const firstName = params.get("firstName") || decoded.first_name || decoded.firstName || "";
+      const lastName = params.get("lastName") || decoded.last_name || decoded.lastName || "";
+      const email = params.get("email") || decoded.email || "linkedin_user@sureproed.com";
+      const userObj = {
+        id: decoded.user_id || decoded.id || undefined,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        firstName,
+        lastName,
+        role: decoded.role || "STUDENT",
+      };
+      setUserInfo(userObj);
+      updateUser(userObj);
+      window.history.replaceState({}, "", "/login");
+      navigate("/student/profile", { replace: true });
+    }
+  }, [navigate, updateUser]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await login(username, password);
-      navigate("/student/profile");
+      const res = await login(username, password);
+      const userRole = res?.user?.role;
+      if (userRole === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else if (userRole === "MENTOR") {
+        navigate("/mentor/dashboard");
+      } else {
+        navigate("/student/profile");
+      }
     } catch (err) {
       console.error("Login error:", err);
       const resData = err.response?.data;
@@ -40,21 +77,27 @@ function Login() {
             .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(" ") : v}`)
             .join(" | ");
         }
+      } else if (err.message) {
+        msg = err.message;
       }
       setError(msg);
-    }
- finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const handleLinkedInAuth = async () => {
+    setError("");
     try {
       const data = await authService.getLinkedInConnectUrl();
-      if (data?.auth_url) {
-        window.location.href = data.auth_url;
+      const targetUrl = data?.authorization_url || data?.auth_url;
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      } else {
+        setError("Could not retrieve LinkedIn authorization URL.");
       }
     } catch (err) {
+      console.error("LinkedIn Auth Error:", err);
       setError("Failed to connect to LinkedIn OAuth provider.");
     }
   };
@@ -72,14 +115,12 @@ function Login() {
           <h1>Student Login</h1>
 
           <p className={styles.subtitle}>
-            Access is available only for students who have successfully
-            qualified the screening exam and have been assigned to an
-            internship cohort.
+            Access is available for registered students, mentors, and administrators.
           </p>
 
-          {error && <div style={{ color: "#dc2626", marginBottom: "1rem", fontSize: "14px" }}>{error}</div>}
+          {error && <div style={{ color: "#dc2626", marginBottom: "1rem", fontSize: "14px", backgroundColor: "#fef2f2", padding: "0.5rem", borderRadius: "4px" }}>❌ {error}</div>}
 
-          {/* Email & Password Form above LinkedIn button */}
+          {/* Email & Password Form */}
           <form onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
               <label>Email / Username</label>
@@ -88,7 +129,7 @@ function Login() {
                 className={styles.input}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter Email or Username"
+                placeholder="Enter Email or Username (e.g. student@sureproed.com)"
                 required
               />
             </div>
@@ -128,11 +169,11 @@ function Login() {
           </button>
 
           <div className={styles.infoBox}>
-            <h3>Who can login?</h3>
+            <h3>Portal Access</h3>
             <ul>
-              <li>Qualified Screening Exam</li>
-              <li>Assigned to Internship Cohort</li>
-              <li>LinkedIn Account Connected</li>
+              <li>Students: Use Student Login or Sign in with LinkedIn</li>
+              <li>Mentors: Use Email Login or <Link to="/mentor/login">Mentor Portal</Link></li>
+              <li>Admins: Use Email Login or <Link to="/admin/login">Admin Portal</Link></li>
             </ul>
           </div>
 

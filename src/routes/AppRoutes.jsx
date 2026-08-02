@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
 /* Layouts */
@@ -185,6 +185,7 @@ function AppRoutes() {
             <Route path="cohorts" element={<MyCohort />} />
             <Route path="class-schedule" element={<ClassSchedule />} />
             <Route path="mentor-details" element={<MentorDetails />} />
+            <Route path="course/:id" element={<CourseDetails />} />
 
             <Route path="attendance" element={<Attendance />} />
             <Route path="attendance-history" element={<AttendanceHistory />} />
@@ -208,33 +209,35 @@ function AppRoutes() {
 
             {/* Students */}
             <Route path="students" element={<Students />} />
-            <Route path="student-details" element={<StudentDetails />} />
+            <Route path="student-details/:id" element={<StudentDetails />} />
             <Route path="add-student" element={<AddStudent />} />
-            <Route path="edit-student" element={<EditStudent />} />
+            <Route path="edit-student/:id" element={<EditStudent />} />
 
             {/* Mentors */}
             <Route path="mentors" element={<Mentors />} />
-            <Route path="mentor-details" element={<AdminMentorDetails />} />
+            <Route path="mentor-details/:id" element={<AdminMentorDetails />} />
             <Route path="add-mentor" element={<AddMentor />} />
-            <Route path="edit-mentor" element={<EditMentor />} />
+            <Route path="edit-mentor/:id" element={<EditMentor />} />
 
             {/* Companies */}
             <Route path="companies" element={<Companies />} />
-            <Route path="company-details" element={<CompanyDetails />} />
+            <Route path="company-details/:id" element={<CompanyDetails />} />
             <Route path="add-company" element={<AddCompany />} />
-            <Route path="edit-company" element={<EditCompany />} />
+            <Route path="edit-company/:id" element={<EditCompany />} />
 
             {/* Courses */}
             <Route path="courses" element={<Courses />} />
             <Route path="course-details" element={<AdminCourseDetails />} />
+            <Route path="course-details/:id" element={<AdminCourseDetails />} />
             <Route path="add-course" element={<AddCourse />} />
             <Route path="edit-course" element={<EditCourse />} />
+            <Route path="edit-course/:id" element={<EditCourse />} />
 
             {/* Applications */}
             <Route path="applications" element={<Applications />} />
-            <Route path="application-details" element={<ApplicationDetails />} />
-            <Route path="approve-application" element={<ApproveApplication />} />
-            <Route path="reject-application" element={<RejectApplication />} />
+            <Route path="application-details/:id" element={<ApplicationDetails />} />
+            <Route path="approve-application/:id" element={<ApproveApplication />} />
+            <Route path="reject-application/:id" element={<RejectApplication />} />
 
             {/* Exams */}
             <Route path="exams" element={<Exams />} />
@@ -245,8 +248,10 @@ function AppRoutes() {
             {/* Cohorts */}
             <Route path="cohorts" element={<Cohorts />} />
             <Route path="cohort-details" element={<CohortDetails />} />
+            <Route path="cohort-details/:id" element={<CohortDetails />} />
             <Route path="add-cohort" element={<AddCohort />} />
             <Route path="edit-cohort" element={<EditCohort />} />
+            <Route path="edit-cohort/:id" element={<EditCohort />} />
 
             {/* Attendance */}
             <Route path="attendance" element={<AttendanceManagement />} />

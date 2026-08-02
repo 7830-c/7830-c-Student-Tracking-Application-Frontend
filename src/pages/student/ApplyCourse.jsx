@@ -1,44 +1,35 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { studentService } from "../../services/studentService";
+import { courseService } from "../../services/courseService";
 import styles from "./ApplyCourse.module.css";
-
-const courses = [
-  {
-    id: 1,
-    code: "JFS001",
-    name: "Java Full Stack Development",
-    domain: "Software Development",
-    duration: "12 Weeks",
-    difficulty: "Beginner",
-    description:
-      "Learn Java, Spring Boot, React, MySQL and build real-world full-stack applications."
-  },
-  {
-    id: 2,
-    code: "EMB001",
-    name: "Embedded C Programming",
-    domain: "Embedded Systems",
-    duration: "10 Weeks",
-    difficulty: "Intermediate",
-    description:
-      "Master Embedded C programming, microcontrollers and embedded application development."
-  },
-  {
-    id: 3,
-    code: "VLSI001",
-    name: "RTL001 - RTL Design with Verilog",
-    domain: "VLSI",
-    duration: "12 Weeks",
-    difficulty: "Intermediate",
-    description:
-      "Learn Digital Design, Verilog HDL and RTL Design for VLSI industry."
-  }
-];
 
 function ApplyCourse() {
   const location = useLocation();
+  const { user } = useAuth();
+  const [profileCompleted, setProfileCompleted] = useState(Boolean(location.state?.profileCompleted));
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const profileCompleted =
-    location.state?.profileCompleted || false;
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [profileData, coursesData] = await Promise.all([
+          user?.email ? studentService.getProfile(user.email) : Promise.resolve(null),
+          courseService.getCourses(),
+        ]);
+        setProfileCompleted(studentService.isProfileComplete(profileData));
+        setCourses(coursesData || []);
+      } catch (err) {
+        console.error("Failed to load apply-course data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [user, location.state?.profileCompleted]);
 
   return (
     <div className={styles.coursePage}>
@@ -53,6 +44,9 @@ function ApplyCourse() {
           </p>
         </div>
 
+        {loading ? (
+          <p>Loading courses from the database...</p>
+        ) : (
         <div className={styles.courseGrid}>
 
           {courses.map((course) => (
@@ -83,7 +77,7 @@ function ApplyCourse() {
 
                 <div>
                   <strong>Duration</strong>
-                  <span>{course.duration}</span>
+                  <span>{course.duration_weeks ? `${course.duration_weeks} Weeks` : "N/A"}</span>
                 </div>
 
                 <div>
@@ -103,14 +97,12 @@ function ApplyCourse() {
                     View Details
                   </Link>
                 ) : (
-                  <button
+                  <Link
+                    to="/student/profile"
                     className={styles.detailsBtn}
-                    onClick={() =>
-                      alert("Please complete your profile first.")
-                    }
                   >
                     Complete Profile First
-                  </button>
+                  </Link>
                 )}
 
               </div>
@@ -119,6 +111,7 @@ function ApplyCourse() {
           ))}
 
         </div>
+        )}
 
       </div>
     </div>

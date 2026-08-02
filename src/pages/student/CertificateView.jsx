@@ -1,85 +1,60 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styles from "./CertificateVerify.module.css";
 
-function CertificateVerify() {
-  const navigate = useNavigate();
+function CertificateView() {
+  const location = useLocation();
+  const certificate = location.state?.certificate;
 
-  const handleVerify = () => {
-    alert("✅ Certificate Verified Successfully!");
-
-    setTimeout(() => {
-      navigate("/student/profile");
-    }, 1000);
+  const formatDate = (value) => {
+    if (!value) return "N/A";
+    return new Date(value).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
-        <h1>Certificate Verification</h1>
+        <h1>Certificate Details</h1>
 
         <p className={styles.subtitle}>
-          Enter the Certificate ID to verify its authenticity.
+          This certificate is loaded from the backend database.
         </p>
 
-        <div className={styles.form}>
+        {!certificate ? (
+          <p>No certificate details were provided.</p>
+        ) : (
+          <div className={styles.result}>
+            <h2 className={styles.verified}>✅ Certificate Available</h2>
 
-          <input
-            type="text"
-            placeholder="Enter Certificate ID"
-            defaultValue="CERT-2026-001"
-          />
+            <div className={styles.details}>
+              <div className={styles.row}>
+                <strong>Certificate ID</strong>
+                <span>{certificate.certificate_number || certificate.id}</span>
+              </div>
 
-          <button
-            type="button"
-            className={styles.verifyBtn}
-            onClick={handleVerify}
-          >
-            Verify Certificate
-          </button>
+              <div className={styles.row}>
+                <strong>Type</strong>
+                <span>{certificate.certificate_type || "Certificate"}</span>
+              </div>
 
-        </div>
+              <div className={styles.row}>
+                <strong>Issue Date</strong>
+                <span>{formatDate(certificate.issued_at)}</span>
+              </div>
 
-        <div className={styles.result}>
-
-          <h2 className={styles.verified}>
-            ✅ Certificate Verified
-          </h2>
-
-          <div className={styles.details}>
-
-            <div className={styles.row}>
-              <strong>Student Name</strong>
-              <span>Somesh Kumar Srinadha</span>
+              <div className={styles.row}>
+                <strong>Status</strong>
+                <span className={styles.active}>{certificate.status || "ACTIVE"}</span>
+              </div>
             </div>
-
-            <div className={styles.row}>
-              <strong>Course</strong>
-              <span>Java Full Stack Development</span>
-            </div>
-
-            <div className={styles.row}>
-              <strong>Certificate ID</strong>
-              <span>CERT-2026-001</span>
-            </div>
-
-            <div className={styles.row}>
-              <strong>Issue Date</strong>
-              <span>20 Aug 2026</span>
-            </div>
-
-            <div className={styles.row}>
-              <strong>Status</strong>
-              <span className={styles.active}>Valid</span>
-            </div>
-
           </div>
-
-        </div>
-
+        )}
       </div>
     </div>
   );
 }
 
-export default CertificateVerify;
+export default CertificateView;

@@ -12,6 +12,8 @@ export const API_ENDPOINTS = {
   USERS: {
     BASE: "/api/users/",
     BY_ID: (id) => `/api/users/${id}/`,
+    ME: "/api/users/me/",
+    RESET_PASSWORD: "/api/users/reset-password/",
   },
 
   // Students / Student Profiles

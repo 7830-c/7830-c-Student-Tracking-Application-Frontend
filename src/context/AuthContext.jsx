@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "../services/authService";
-import { studentService } from "../services/studentService";
+import apiClient from "../services/apiClient";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 import {
   getAccessToken,
+  getRefreshToken,
   getUserInfo,
   setUserInfo,
   setAccessToken,
@@ -16,16 +18,19 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // On mount: restore user from stored token
   useEffect(() => {
     const token = getAccessToken();
     const storedUser = getUserInfo();
+
     if (token && storedUser) {
       setUser(storedUser);
-    } else if (token && !token.includes("session_token")) {
+    } else if (token) {
+      // Try to decode user info from JWT
       const decoded = parseJwt(token);
-      if (decoded) setUser(decoded);
-    } else if (storedUser) {
-      setUser(storedUser);
+      if (decoded) {
+        setUser(decoded);
+      }
     }
     setLoading(false);
   }, []);
@@ -38,122 +43,122 @@ export function AuthProvider({ children }) {
     });
   };
 
+  /**
+   * Fetch the authenticated user's profile from the backend
+   * after a successful JWT login if not already included.
+   */
+  const fetchUserProfile = async () => {
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.USERS.ME);
+      return response.data;
+    } catch (err) {
+      console.warn("Could not fetch /api/users/me/:", err.message);
+      return null;
+    }
+  };
+
+  /**
+   * Login flow (Backend-First):
+   *  1. Always attempt real backend JWT authentication first
+   *  2. On success → store real JWT tokens & user info
+   *  3. On network failure → fall back to demo accounts for offline testing
+   *  4. On auth failure (401/400) → throw error (wrong credentials)
+   */
   const login = async (identifier, password) => {
     setLoading(true);
     const cleanId = (identifier || "").trim().toLowerCase();
 
-    // 1. Check for registered student account/profile in storage
-    const registeredProfile = await studentService.getProfile(cleanId);
-    if (registeredProfile) {
-      const userObj = {
-        email: registeredProfile.email,
-        firstName: registeredProfile.firstName || "Student",
-        lastName: registeredProfile.lastName || "",
-        first_name: registeredProfile.firstName || "Student",
-        last_name: registeredProfile.lastName || "",
-        phoneNumber: registeredProfile.phoneNumber || "",
-        phone_number: registeredProfile.phoneNumber || "",
-        role: "STUDENT",
-      };
-      setUser(userObj);
-      setUserInfo(userObj);
-      setAccessToken("local_session_token");
-      setLoading(false);
-      return { access: "local_session_token", user: userObj };
-    }
-
-    // 2. Check Demo Accounts for quick testing
-    if (
-      (cleanId === "student@sureproed.com" || cleanId === "student") &&
-      password === "student123"
-    ) {
-      const demoEmail = "student@sureproed.com";
-      let studentProfile = await studentService.getProfile(demoEmail);
-      if (!studentProfile) {
-        studentProfile = await studentService.registerStudentProfile({
-          firstName: "Demo",
-          lastName: "Student",
-          email: demoEmail,
-          phoneNumber: "9876543210",
-        });
-      }
-      const studentUser = {
-        email: demoEmail,
-        username: "student",
-        firstName: studentProfile.firstName || "Demo",
-        lastName: studentProfile.lastName || "Student",
-        first_name: studentProfile.firstName || "Demo",
-        last_name: studentProfile.lastName || "Student",
-        phoneNumber: studentProfile.phoneNumber || "9876543210",
-        role: "STUDENT",
-      };
-      setUser(studentUser);
-      setUserInfo(studentUser);
-      setAccessToken("student_session_token");
-      setLoading(false);
-      return { access: "student_session_token", user: studentUser };
-    }
-
-    if (
-      (identifier === "admin@sureproed.com" || identifier === "admin") &&
-      password === "admin123"
-    ) {
-      const adminUser = { email: "admin@sureproed.com", username: "admin", role: "ADMIN" };
-      setUser(adminUser);
-      setUserInfo(adminUser);
-      setAccessToken("admin_session_token");
-      setLoading(false);
-      return { access: "admin_session_token", user: adminUser };
-    }
-
-    if (
-      (identifier === "mentor@sureproed.com" || identifier === "mentor") &&
-      password === "mentor123"
-    ) {
-      const mentorUser = { email: "mentor@sureproed.com", username: "mentor", role: "MENTOR" };
-      setUser(mentorUser);
-      setUserInfo(mentorUser);
-      setAccessToken("mentor_session_token");
-      setLoading(false);
-      return { access: "mentor_session_token", user: mentorUser };
-    }
-
-    // 3. Fallback: Allow login for any valid email identifier by auto-creating session & profile if needed
-    if (cleanId.includes("@")) {
-      const initialProfile = await studentService.registerStudentProfile({
-        firstName: "Student",
-        lastName: "",
-        email: cleanId,
-        phoneNumber: "",
-      });
-      const userObj = {
-        email: cleanId,
-        firstName: initialProfile.firstName,
-        lastName: initialProfile.lastName,
-        first_name: initialProfile.firstName,
-        last_name: initialProfile.lastName,
-        phoneNumber: initialProfile.phoneNumber,
-        role: "STUDENT",
-      };
-      setUser(userObj);
-      setUserInfo(userObj);
-      setAccessToken("local_session_token");
-      setLoading(false);
-      return { access: "local_session_token", user: userObj };
-    }
-
-    // 4. Attempt Live Backend API Login
+    // ── 1. Attempt Live Backend JWT Login ──────────────────────
     try {
-      const data = await authService.login(identifier, password);
-      const decoded = parseJwt(data.access) || { email: identifier, role: "STUDENT" };
-      setUser(decoded);
-      setUserInfo(decoded);
+      const data = await authService.login(cleanId, password);
+      // data = { access, refresh, user } — tokens stored by authService.login()
+
+      let userObj;
+      if (data?.user) {
+        userObj = {
+          id: data.user.id,
+          email: data.user.email,
+          first_name: data.user.first_name || "",
+          last_name: data.user.last_name || "",
+          firstName: data.user.first_name || "",
+          lastName: data.user.last_name || "",
+          phone_number: data.user.phone_number || "",
+          phoneNumber: data.user.phone_number || "",
+          role: data.user.role || "STUDENT",
+          is_active: data.user.is_active,
+        };
+      } else {
+        const profile = await fetchUserProfile();
+        if (profile) {
+          userObj = {
+            id: profile.id,
+            email: profile.email,
+            first_name: profile.first_name || "",
+            last_name: profile.last_name || "",
+            firstName: profile.first_name || "",
+            lastName: profile.last_name || "",
+            phone_number: profile.phone_number || "",
+            phoneNumber: profile.phone_number || "",
+            role: profile.role || "STUDENT",
+            is_active: profile.is_active,
+          };
+        } else {
+          const decoded = parseJwt(data.access) || {};
+          userObj = {
+            email: decoded.email || cleanId,
+            role: decoded.role || "STUDENT",
+            user_id: decoded.user_id,
+          };
+        }
+      }
+
+      setUser(userObj);
+      setUserInfo(userObj);
       setLoading(false);
-      return data;
+      return { ...data, user: userObj };
     } catch (err) {
-      setLoading(false);
-      throw err;
+      if (err.response) {
+        setLoading(false);
+        throw err;
+      }
+
+      console.warn("Backend unreachable, falling back to demo accounts:", err.message);
     }
+
+    // ── 2. Demo / Offline Fallback ──────────────────────────────
+    const demoAccounts = {
+      "admin@sureproed.com": { role: "ADMIN", first_name: "Admin", last_name: "User" },
+      "admin": { role: "ADMIN", first_name: "Admin", last_name: "User", password: "admin123" },
+      "mentor@sureproed.com": { role: "MENTOR", first_name: "Demo", last_name: "Mentor" },
+      "mentor": { role: "MENTOR", first_name: "Demo", last_name: "Mentor", password: "mentor123" },
+      "student@sureproed.com": { role: "STUDENT", first_name: "Demo", last_name: "Student" },
+      "student": { role: "STUDENT", first_name: "Demo", last_name: "Student", password: "student123" },
+    };
+
+    const demo = demoAccounts[cleanId];
+    if (demo) {
+      const requiredPw = demo.password || (cleanId.includes("admin") ? "admin123" : cleanId.includes("mentor") ? "mentor123" : "student123");
+      if (password !== requiredPw) {
+        setLoading(false);
+        throw new Error("Invalid credentials (demo mode)");
+      }
+      const demoUser = {
+        email: cleanId.includes("@") ? cleanId : `${cleanId}@sureproed.com`,
+        first_name: demo.first_name,
+        last_name: demo.last_name,
+        firstName: demo.first_name,
+        lastName: demo.last_name,
+        role: demo.role,
+      };
+      setUser(demoUser);
+      setUserInfo(demoUser);
+      setAccessToken("demo_session_token");
+      setLoading(false);
+      return { access: "demo_session_token", user: demoUser };
+    }
+
+    setLoading(false);
+    throw new Error("Backend is not running and no demo account matches this login. Please start the Django server.");
   };
 
   const logout = () => {
@@ -182,4 +187,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

@@ -1,83 +1,76 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./MyStudents.module.css";
 
 function MyStudents() {
-  const students = [
-    {
-      id: 1,
-      name: "Rahul Kumar",
-      email: "rahul@gmail.com",
-      cohort: "Java Full Stack - Batch A",
-      attendance: "96%",
-    },
-    {
-      id: 2,
-      name: "Priya Sharma",
-      email: "priya@gmail.com",
-      cohort: "Java Full Stack - Batch A",
-      attendance: "92%",
-    },
-    {
-      id: 3,
-      name: "Sai Kiran",
-      email: "saikiran@gmail.com",
-      cohort: "Java Full Stack - Batch A",
-      attendance: "89%",
-    },
-    {
-      id: 4,
-      name: "Anjali Reddy",
-      email: "anjali@gmail.com",
-      cohort: "Java Full Stack - Batch A",
-      attendance: "98%",
-    },
-  ];
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadStudents = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.STUDENTS.BASE);
+        if (isMounted) setStudents(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        console.error("Failed to load mentor students:", err);
+        if (isMounted) setStudents([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadStudents();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className={styles.container}>
-
       <div className={styles.header}>
         <h1>My Students</h1>
-        <p>Students assigned to your cohort</p>
+        <p>Students available from the database</p>
       </div>
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Cohort</th>
-              <th>Attendance</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {students.map((student) => (
-              <tr key={student.id}>
-
-                <td>{student.name}</td>
-                <td>{student.email}</td>
-                <td>{student.cohort}</td>
-                <td>{student.attendance}</td>
-
-                <td>
-                  <Link to="/mentor/student-details">
-                    View
-                  </Link>
-                </td>
-
+      {loading ? (
+        <p>Loading students from the database...</p>
+      ) : students.length === 0 ? (
+        <p>No student records are available yet.</p>
+      ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>College</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
+            </thead>
 
-          </tbody>
-
-        </table>
-      </div>
-
+            <tbody>
+              {students.map((student) => {
+                const user = student.user || {};
+                return (
+                  <tr key={student.id}>
+                    <td>{`${user.first_name || ""} ${user.last_name || ""}`.trim() || user.email || "Unknown"}</td>
+                    <td>{user.email || "N/A"}</td>
+                    <td>{student.college || "N/A"}</td>
+                    <td>{student.status || "PENDING"}</td>
+                    <td>
+                      <Link to="/mentor/student-details">View</Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

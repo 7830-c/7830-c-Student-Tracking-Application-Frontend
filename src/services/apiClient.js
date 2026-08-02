@@ -16,11 +16,29 @@ const apiClient = axios.create({
   },
 });
 
-// Request Interceptor: Attach JWT Bearer Token if valid JWT
+export const normalizeListResponse = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  if (payload && Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  return [];
+};
+
+// Request Interceptor: Attach JWT Bearer Token
 apiClient.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
-    if (token && !token.includes("session_token")) {
+    // Only attach the token if it looks like a real JWT (contains dots)
+    // Skip demo/session tokens that are just plain strings
+    if (token && token.includes(".")) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

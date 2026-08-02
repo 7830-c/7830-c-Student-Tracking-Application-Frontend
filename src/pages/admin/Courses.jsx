@@ -1,83 +1,80 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient, { normalizeListResponse } from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./Courses.module.css";
 
 function Courses() {
-  const courses = [
-    {
-      id: 1,
-      title: "Java Full Stack",
-      duration: "6 Months",
-      mentor: "Ravi Kumar",
-      students: 120,
-      status: "Active",
-    },
-    {
-      id: 2,
-      title: "Python Full Stack",
-      duration: "5 Months",
-      mentor: "Anitha",
-      students: 95,
-      status: "Active",
-    },
-    {
-      id: 3,
-      title: "MERN Stack",
-      duration: "4 Months",
-      mentor: "Suresh",
-      students: 80,
-      status: "Upcoming",
-    },
-  ];
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadCourses = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.COURSES.BASE);
+        if (isMounted) setCourses(normalizeListResponse(response.data));
+      } catch (err) {
+        console.error("Failed to load courses:", err);
+        if (isMounted) setCourses([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadCourses();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
         <div className={styles.header}>
           <h1>Course Management</h1>
-
           <Link to="/admin/add-course" className={styles.addBtn}>
             + Add Course
           </Link>
         </div>
 
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Course</th>
-                <th>Duration</th>
-                <th>Mentor</th>
-                <th>Students</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {courses.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.title}</td>
-                  <td>{course.duration}</td>
-                  <td>{course.mentor}</td>
-                  <td>{course.students}</td>
-                  <td>
-                    <span className={styles.status}>
-                      {course.status}
-                    </span>
-                  </td>
-
-                  <td className={styles.actions}>
-                    <Link to="/admin/course-details">View</Link>
-
-                    <Link to="/admin/edit-course">Edit</Link>
-                  </td>
+        {loading ? (
+          <p>Loading courses from the database...</p>
+        ) : courses.length === 0 ? (
+          <p>No courses have been created yet. Create one from the button above.</p>
+        ) : (
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Duration</th>
+                  <th>Domain</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
 
+              <tbody>
+                {courses.map((course) => (
+                  <tr key={course.id}>
+                    <td>{course.name}</td>
+                    <td>{course.duration_weeks ? `${course.duration_weeks} Weeks` : "N/A"}</td>
+                    <td>{course.domain || "N/A"}</td>
+                    <td>
+                      <span className={styles.status}>{course.status || "DRAFT"}</span>
+                    </td>
+
+                    <td className={styles.actions}>
+                      <Link to={`/admin/course-details/${course.id}`}>View</Link>
+                      <Link to={`/admin/edit-course/${course.id}`}>Edit</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

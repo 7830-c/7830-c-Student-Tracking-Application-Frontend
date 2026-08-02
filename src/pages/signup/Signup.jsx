@@ -44,33 +44,50 @@ function Signup() {
 
     setLoading(true);
 
-    // Register student profile in storage (capturing First Name, Last Name, Email, Phone Number WITHOUT storing password)
-    await studentService.registerStudentProfile({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phoneNumber: formData.phoneNumber,
-    });
-
     try {
       const payload = {
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        phone_number: formData.phoneNumber || null,
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        phone_number: formData.phoneNumber ? formData.phoneNumber.trim() : null,
         role: "STUDENT",
       };
 
       await userService.createUser(payload);
-    } catch (err) {
-      console.warn("Backend user creation Notice (handled by local storage session):", err);
-    } finally {
-      setLoading(false);
+
+      // Register profile details in local storage as well for fast access
+      await studentService.registerStudentProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+      });
+
       setSuccess("Account Created Successfully! Redirecting to login...");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
+    } catch (err) {
+      console.error("Registration error:", err);
+      const resData = err.response?.data;
+      let msg = "Failed to create account. Please check your inputs and try again.";
+      if (resData) {
+        if (typeof resData === "string") {
+          msg = resData;
+        } else if (resData.email) {
+          msg = Array.isArray(resData.email) ? `Email: ${resData.email.join(" ")}` : `Email: ${resData.email}`;
+        } else if (resData.detail) {
+          msg = resData.detail;
+        } else if (typeof resData === "object") {
+          msg = Object.entries(resData)
+            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(" ") : v}`)
+            .join(" | ");
+        }
+      }
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,13 +106,13 @@ function Signup() {
           <h2>Create Student Account</h2>
 
           {error && (
-            <div style={{ color: "#dc2626", marginBottom: "1rem", fontSize: "14px", textAlign: "center" }}>
+            <div style={{ color: "#dc2626", marginBottom: "1rem", fontSize: "14px", textAlign: "center", backgroundColor: "#fef2f2", padding: "0.5rem", borderRadius: "4px" }}>
               ❌ {error}
             </div>
           )}
 
           {success && (
-            <div style={{ color: "#16a34a", marginBottom: "1rem", fontSize: "14px", textAlign: "center", fontWeight: "600" }}>
+            <div style={{ color: "#16a34a", marginBottom: "1rem", fontSize: "14px", textAlign: "center", fontWeight: "600", backgroundColor: "#f0fdf4", padding: "0.5rem", borderRadius: "4px" }}>
               ✅ {success}
             </div>
           )}

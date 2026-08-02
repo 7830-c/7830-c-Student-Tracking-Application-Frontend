@@ -4,6 +4,7 @@ import { studentService } from "../../services/studentService";
 import { courseService } from "../../services/courseService";
 import { cohortService } from "../../services/cohortService";
 import { applicationService } from "../../services/applicationService";
+import { normalizeListResponse } from "../../services/apiClient";
 import styles from "./Dashboard.module.css";
 
 function Dashboard() {
@@ -27,15 +28,19 @@ function Dashboard() {
           applicationService.getApplications(),
         ]);
 
-        const studentsCount = studentsRes.status === "fulfilled" ? (studentsRes.value.count || studentsRes.value.length || 0) : 0;
-        const coursesCount = coursesRes.status === "fulfilled" ? (coursesRes.value.count || coursesRes.value.length || 0) : 0;
-        const cohortsCount = cohortsRes.status === "fulfilled" ? (cohortsRes.value.count || cohortsRes.value.length || 0) : 0;
-        
+        const studentsList = studentsRes.status === "fulfilled" ? normalizeListResponse(studentsRes.value) : [];
+        const coursesList = coursesRes.status === "fulfilled" ? normalizeListResponse(coursesRes.value) : [];
+        const cohortsList = cohortsRes.status === "fulfilled" ? normalizeListResponse(cohortsRes.value) : [];
+
+        const studentsCount = studentsList.length;
+        const coursesCount = coursesList.length;
+        const cohortsCount = cohortsList.length;
+
         let appsData = [];
         let applicationsCount = 0;
         if (appsRes.status === "fulfilled") {
-          appsData = appsRes.value.results || appsRes.value || [];
-          applicationsCount = appsRes.value.count || appsData.length;
+          appsData = normalizeListResponse(appsRes.value);
+          applicationsCount = appsData.length;
         }
 
         setStats({
@@ -108,9 +113,9 @@ function Dashboard() {
                 </tr>
               ) : (
                 recentApplications.map((app) => (
-                  <tr key={app.id}>
-                    <td>{app.application_number || app.id.slice(0, 8)}</td>
-                    <td>{app.course_title || app.course || "Course N/A"}</td>
+                  <tr key={app.id || app.application_number || Math.random()}>
+                    <td>{app.application_number || (typeof app.id === "string" ? app.id.slice(0, 8) : "N/A")}</td>
+                    <td>{app.course_title || app.course?.name || app.course || "Course N/A"}</td>
                     <td>{app.applied_at ? new Date(app.applied_at).toLocaleDateString() : "N/A"}</td>
                     <td>
                       <span

@@ -11,22 +11,15 @@ function Profile() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    dob: "",
-    gender: "",
     email: "",
     phoneNumber: "",
     collegeName: "",
-    university: "",
     degree: "",
     branch: "",
-    currentYear: "",
-    cgpa: "",
     graduationYear: "",
     address: "",
     city: "",
-    district: "",
     state: "",
-    pincode: "",
     technicalSkills: "",
   });
 
@@ -38,22 +31,15 @@ function Profile() {
         setFormData({
           firstName: profile?.firstName || user?.firstName || user?.first_name || "",
           lastName: profile?.lastName || user?.lastName || user?.last_name || "",
-          dob: profile?.dob || "",
-          gender: profile?.gender || "",
           email: profile?.email || user?.email || "",
           phoneNumber: profile?.phoneNumber || user?.phoneNumber || user?.phone_number || "",
           collegeName: profile?.collegeName || "",
-          university: profile?.university || "",
           degree: profile?.degree || "",
           branch: profile?.branch || "",
-          currentYear: profile?.currentYear || "",
-          cgpa: profile?.cgpa || "",
           graduationYear: profile?.graduationYear || "",
           address: profile?.address || "",
           city: profile?.city || "",
-          district: profile?.district || "",
           state: profile?.state || "",
-          pincode: profile?.pincode || "",
           technicalSkills: profile?.technicalSkills || "",
         });
       } catch (err) {
@@ -77,7 +63,8 @@ function Profile() {
     if (!userEmail) return;
 
     try {
-      const savedProfile = await studentService.saveProfile(userEmail, formData);
+      const savedProfile = await studentService.saveProfile(userEmail || user?.email, formData);
+      const isComplete = studentService.isProfileComplete(savedProfile);
       if (updateUser) {
         updateUser({
           firstName: savedProfile.firstName,
@@ -88,15 +75,15 @@ function Profile() {
           phone_number: savedProfile.phoneNumber,
         });
       }
-      alert("Profile Saved Successfully ✅");
+      alert("Profile saved to the database successfully.");
       navigate("/student/apply-course", {
         state: {
-          profileCompleted: true,
+          profileCompleted: isComplete,
         },
       });
     } catch (err) {
       console.error("Error saving profile:", err);
-      alert("Failed to save profile. Please try again.");
+      alert("Profile save failed. Please try again.");
     }
   };
 
@@ -129,7 +116,6 @@ function Profile() {
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="Enter First Name"
-                  required
                 />
               </div>
 
@@ -141,35 +127,7 @@ function Profile() {
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Enter Last Name"
-                  required
                 />
-              </div>
-            </div>
-
-            <div className={styles.row}>
-              <div className={styles.inputGroup}>
-                <label>Date of Birth</label>
-                <input
-                  type="date"
-                  name="dob"
-                  value={formData.dob}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label>Gender</label>
-
-                <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
               </div>
             </div>
 
@@ -182,7 +140,6 @@ function Profile() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter Email Address"
-                  required
                 />
               </div>
 
@@ -194,7 +151,6 @@ function Profile() {
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder="Enter Phone Number"
-                  required
                 />
               </div>
             </div>
@@ -212,17 +168,6 @@ function Profile() {
                 value={formData.collegeName}
                 onChange={handleChange}
                 placeholder="Enter College Name"
-              />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label>University</label>
-              <input
-                type="text"
-                name="university"
-                value={formData.university}
-                onChange={handleChange}
-                placeholder="Enter University Name"
               />
             </div>
 
@@ -253,35 +198,6 @@ function Profile() {
                   value={formData.branch}
                   onChange={handleChange}
                   placeholder="CSE / ECE / IT..."
-                />
-              </div>
-            </div>
-
-            <div className={styles.row}>
-              <div className={styles.inputGroup}>
-                <label>Current Year / Semester</label>
-
-                <select
-                  name="currentYear"
-                  value={formData.currentYear}
-                  onChange={handleChange}
-                >
-                  <option value="">Select</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                </select>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label>CGPA / Percentage</label>
-                <input
-                  type="text"
-                  name="cgpa"
-                  value={formData.cgpa}
-                  onChange={handleChange}
-                  placeholder="8.75"
                 />
               </div>
             </div>
@@ -327,19 +243,6 @@ function Profile() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label>District</label>
-                <input
-                  type="text"
-                  name="district"
-                  value={formData.district}
-                  onChange={handleChange}
-                  placeholder="District"
-                />
-              </div>
-            </div>
-
-            <div className={styles.row}>
-              <div className={styles.inputGroup}>
                 <label>State</label>
                 <input
                   type="text"
@@ -347,17 +250,6 @@ function Profile() {
                   value={formData.state}
                   onChange={handleChange}
                   placeholder="State"
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label>Pincode</label>
-                <input
-                  type="text"
-                  name="pincode"
-                  value={formData.pincode}
-                  onChange={handleChange}
-                  placeholder="Pincode"
                 />
               </div>
             </div>
@@ -379,10 +271,6 @@ function Profile() {
               />
             </div>
 
-            <div className={styles.inputGroup}>
-              <label>Upload Resume</label>
-              <input type="file" />
-            </div>
           </div>
 
           <button
@@ -399,4 +287,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Profile;

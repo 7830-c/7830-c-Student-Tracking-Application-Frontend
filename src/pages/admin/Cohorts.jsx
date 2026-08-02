@@ -1,30 +1,32 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient, { normalizeListResponse } from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./Cohorts.module.css";
 
 function Cohorts() {
-  const cohorts = [
-    {
-      id: 1,
-      name: "Java Full Stack - Batch 12",
-      mentor: "Rahul Sharma",
-      students: 45,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "MERN Stack - Batch 08",
-      mentor: "Anjali Verma",
-      students: 38,
-      status: "Upcoming",
-    },
-    {
-      id: 3,
-      name: "Python Full Stack - Batch 05",
-      mentor: "Kiran Kumar",
-      students: 42,
-      status: "Completed",
-    },
-  ];
+  const [cohorts, setCohorts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadCohorts = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.COHORTS.BASE);
+        if (isMounted) setCohorts(normalizeListResponse(response.data));
+      } catch (err) {
+        console.error("Failed to load cohorts:", err);
+        if (isMounted) setCohorts([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadCohorts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -39,46 +41,43 @@ function Cohorts() {
         </Link>
       </div>
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Cohort</th>
-              <th>Mentor</th>
-              <th>Students</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {cohorts.map((cohort) => (
-              <tr key={cohort.id}>
-                <td>{cohort.name}</td>
-                <td>{cohort.mentor}</td>
-                <td>{cohort.students}</td>
-
-                <td
-                  className={
-                    cohort.status === "Active"
-                      ? styles.active
-                      : cohort.status === "Upcoming"
-                      ? styles.upcoming
-                      : styles.completed
-                  }
-                >
-                  {cohort.status}
-                </td>
-
-                <td className={styles.actions}>
-                  <Link to="/admin/cohort-details">View</Link>
-                  <Link to="/admin/edit-cohort">Edit</Link>
-                </td>
+      {loading ? (
+        <p>Loading cohorts from the database...</p>
+      ) : cohorts.length === 0 ? (
+        <p>No cohorts have been created yet. Create one from the button above.</p>
+      ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Cohort</th>
+                <th>Course</th>
+                <th>Start Date</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+
+            <tbody>
+              {cohorts.map((cohort) => (
+                <tr key={cohort.id}>
+                  <td>{cohort.name || cohort.code || "N/A"}</td>
+                  <td>{cohort.course?.name || cohort.course_name || cohort.course || "N/A"}</td>
+                  <td>{cohort.start_date || "N/A"}</td>
+                  <td className={cohort.status === "ACTIVE" ? styles.active : cohort.status === "OPEN" ? styles.upcoming : styles.completed}>
+                    {cohort.status || "DRAFT"}
+                  </td>
+
+                  <td className={styles.actions}>
+                    <Link to={`/admin/cohort-details/${cohort.id}`}>View</Link>
+                    <Link to={`/admin/edit-cohort/${cohort.id}`}>Edit</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

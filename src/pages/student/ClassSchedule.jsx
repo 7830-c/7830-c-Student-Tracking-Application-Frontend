@@ -1,83 +1,83 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./ClassSchedule.module.css";
 
-const schedule = [
-  {
-    day: "Monday",
-    time: "10:00 AM - 12:00 PM",
-    topic: "Java Fundamentals",
-    mentor: "Rajesh Kumar",
-  },
-  {
-    day: "Tuesday",
-    time: "10:00 AM - 12:00 PM",
-    topic: "Spring Boot",
-    mentor: "Rajesh Kumar",
-  },
-  {
-    day: "Wednesday",
-    time: "10:00 AM - 12:00 PM",
-    topic: "ReactJS",
-    mentor: "Rajesh Kumar",
-  },
-  {
-    day: "Thursday",
-    time: "10:00 AM - 12:00 PM",
-    topic: "MySQL",
-    mentor: "Rajesh Kumar",
-  },
-  {
-    day: "Friday",
-    time: "10:00 AM - 12:00 PM",
-    topic: "Mini Project",
-    mentor: "Rajesh Kumar",
-  },
-];
-
 function ClassSchedule() {
+  const [schedule, setSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadSchedule = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.BASE);
+        if (isMounted) setSchedule(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        console.error("Failed to load class schedule:", err);
+        if (isMounted) setSchedule([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadSchedule();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const formatDate = (value) => {
+    if (!value) return "N/A";
+    return new Date(value).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
         <h1>Class Schedule</h1>
 
-        <p className={styles.subtitle}>
-          Weekly schedule for your internship cohort.
-        </p>
+        <p className={styles.subtitle}>Weekly schedule for your internship cohort.</p>
 
-        <table className={styles.table}>
-
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Time</th>
-              <th>Topic</th>
-              <th>Mentor</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {schedule.map((item, index) => (
-              <tr key={index}>
-                <td>{item.day}</td>
-                <td>{item.time}</td>
-                <td>{item.topic}</td>
-                <td>{item.mentor}</td>
+        {loading ? (
+          <p>Loading schedule from the database...</p>
+        ) : schedule.length === 0 ? (
+          <p>No class schedule entries are available yet.</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Topic</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody>
+              {schedule.map((item) => (
+                <tr key={item.id}>
+                  <td>{formatDate(item.class_date)}</td>
+                  <td>{item.start_time ? `${item.start_time} - ${item.end_time || ""}`.trim() : "N/A"}</td>
+                  <td>{item.title || "Class Session"}</td>
+                  <td>{item.conducted ? "Conducted" : "Scheduled"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
 
         <div className={styles.buttons}>
-          <Link
-            to="/student/mentor-details"
-            className={styles.button}
-          >
+          <Link to="/student/mentor-details" className={styles.button}>
             View Mentor Details
           </Link>
         </div>
-
       </div>
     </div>
   );

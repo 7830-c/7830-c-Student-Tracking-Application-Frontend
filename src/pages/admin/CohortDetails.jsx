@@ -1,83 +1,100 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./CohortDetails.module.css";
 
 function CohortDetails() {
-  const cohort = {
-    name: "Java Full Stack - Batch 12",
-    mentor: "Rahul Sharma",
-    students: 45,
-    startDate: "01 August 2026",
-    endDate: "30 November 2026",
-    duration: "4 Months",
-    status: "Active",
-    description:
-      "This cohort is designed for Java Full Stack training covering Java, Spring Boot, React, SQL and placement preparation.",
-  };
+  const { id } = useParams();
+  const [cohort, setCohort] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadCohort = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.COHORTS.BY_ID(id));
+        setCohort(response.data || null);
+      } catch (err) {
+        console.error("Failed to load cohort details:", err);
+        setError("Unable to load cohort details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadCohort();
+    }
+  }, [id]);
+
+  if (loading) return <div className={styles.container}><div className={styles.card}><h1>Cohort Details</h1><p>Loading cohort details...</p></div></div>;
+  if (error) return <div className={styles.container}><div className={styles.card}><h1>Cohort Details</h1><p style={{ color: "#b91c1c" }}>{error}</p></div></div>;
+  if (!cohort) return <div className={styles.container}><div className={styles.card}><h1>Cohort Details</h1><p>No cohort found.</p></div></div>;
+
+  const mentorNames = (cohort.mentors || [])
+    .map((mentor) => `${mentor.first_name || ""} ${mentor.last_name || ""}`.trim() || mentor.email || "Unknown")
+    .filter(Boolean)
+    .join(", ") || "Not assigned";
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-
         <div className={styles.header}>
           <h1>Cohort Details</h1>
-
-          <Link to="/admin/cohorts">
-            Back
-          </Link>
+          <Link to="/admin/cohorts">Back</Link>
         </div>
 
         <div className={styles.grid}>
-
           <div>
             <label>Cohort Name</label>
-            <p>{cohort.name}</p>
+            <p>{cohort.name || cohort.code || "N/A"}</p>
           </div>
 
           <div>
-            <label>Mentor</label>
-            <p>{cohort.mentor}</p>
+            <label>Course</label>
+            <p>{cohort.course?.name || cohort.course || "N/A"}</p>
           </div>
 
           <div>
-            <label>Students</label>
-            <p>{cohort.students}</p>
+            <label>Mentors</label>
+            <p>{mentorNames}</p>
           </div>
 
           <div>
-            <label>Duration</label>
-            <p>{cohort.duration}</p>
+            <label>Max Students</label>
+            <p>{cohort.max_students ?? "N/A"}</p>
           </div>
 
           <div>
             <label>Start Date</label>
-            <p>{cohort.startDate}</p>
+            <p>{cohort.start_date || "N/A"}</p>
           </div>
 
           <div>
             <label>End Date</label>
-            <p>{cohort.endDate}</p>
+            <p>{cohort.end_date || "N/A"}</p>
           </div>
 
           <div>
             <label>Status</label>
-            <span className={styles.active}>
-              {cohort.status}
-            </span>
+            <span className={styles.active}>{cohort.status || "DRAFT"}</span>
           </div>
 
+          <div>
+            <label>Meeting Link</label>
+            <p>{cohort.meeting_link || "N/A"}</p>
+          </div>
         </div>
 
         <div className={styles.description}>
-          <label>Description</label>
-          <p>{cohort.description}</p>
+          <label>Code</label>
+          <p>{cohort.code || "N/A"}</p>
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/admin/edit-cohort">
-            Edit Cohort
-          </Link>
+          <Link to={`/admin/edit-cohort/${cohort.id}`}>Edit Cohort</Link>
         </div>
-
       </div>
     </div>
   );

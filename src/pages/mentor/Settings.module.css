@@ -46,6 +46,28 @@ select {
   outline: none;
 }
 
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.label input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
 button {
   margin-top: 20px;
   padding: 14px 24px;
@@ -60,4 +82,18 @@ button {
 
 button:hover {
   background: #1d4ed8;
+}
+
+.success {
+  color: #166534;
+  background: #ecfdf3;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.error {
+  color: #b91c1c;
+  background: #fef2f2;
+  padding: 10px 12px;
+  border-radius: 8px;
 }

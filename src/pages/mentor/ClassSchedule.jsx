@@ -1,80 +1,72 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./ClassSchedule.module.css";
 
 function ClassSchedule() {
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const schedules = [
-    {
-      id: 1,
-      course: "Java Full Stack",
-      batch: "Batch A",
-      day: "Monday - Friday",
-      time: "10:00 AM - 12:00 PM",
-      room: "Google Meet",
-    },
-    {
-      id: 2,
-      course: "MERN Stack",
-      batch: "Batch B",
-      day: "Monday - Friday",
-      time: "2:00 PM - 4:00 PM",
-      room: "Google Meet",
-    },
-    {
-      id: 3,
-      course: "Python Full Stack",
-      batch: "Batch C",
-      day: "Saturday",
-      time: "9:00 AM - 12:00 PM",
-      room: "Google Meet",
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    const loadSchedules = async () => {
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.COHORTS.BASE);
+        if (isMounted) setSchedules(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        console.error("Failed to load class schedule:", err);
+        if (isMounted) setSchedules([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadSchedules();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className={styles.container}>
-
       <div className={styles.header}>
         <h1>Class Schedule</h1>
       </div>
 
-      <table className={styles.table}>
-
-        <thead>
-          <tr>
-            <th>Course</th>
-            <th>Batch</th>
-            <th>Days</th>
-            <th>Time</th>
-            <th>Platform</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          {schedules.map((item) => (
-
-            <tr key={item.id}>
-              <td>{item.course}</td>
-              <td>{item.batch}</td>
-              <td>{item.day}</td>
-              <td>{item.time}</td>
-              <td>{item.room}</td>
+      {loading ? (
+        <p>Loading cohort schedules from the database...</p>
+      ) : schedules.length === 0 ? (
+        <p>No cohort schedules are available yet.</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Cohort</th>
+              <th>Course</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Status</th>
             </tr>
+          </thead>
 
-          ))}
-
-        </tbody>
-
-      </table>
+          <tbody>
+            {schedules.map((item) => (
+              <tr key={item.id}>
+                <td>{item.name || item.code || "N/A"}</td>
+                <td>{item.course?.name || item.course || "N/A"}</td>
+                <td>{item.start_date || "N/A"}</td>
+                <td>{item.end_date || "N/A"}</td>
+                <td>{item.status || "PENDING"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <div className={styles.footer}>
-
-        <Link to="/mentor/cohorts">
-          ← Back to Cohorts
-        </Link>
-
+        <Link to="/mentor/cohorts">← Back to Cohorts</Link>
       </div>
-
     </div>
   );
 }

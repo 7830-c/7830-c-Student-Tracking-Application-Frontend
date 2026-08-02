@@ -1,33 +1,54 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../../services/apiClient";
+import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import styles from "./Exams.module.css";
 
 function Exams() {
-  const exams = [
-    {
-      id: 1,
-      title: "Java Screening Test",
-      course: "Java Full Stack",
-      duration: "60 mins",
-      questions: 30,
-      status: "Active",
-    },
-    {
-      id: 2,
-      title: "MERN Screening Test",
-      course: "MERN Stack",
-      duration: "45 mins",
-      questions: 25,
-      status: "Upcoming",
-    },
-    {
-      id: 3,
-      title: "Python Screening Test",
-      course: "Python Full Stack",
-      duration: "60 mins",
-      questions: 35,
-      status: "Completed",
-    },
-  ];
+  const [exams, setExams] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const [examsResponse, applicationsResponse, coursesResponse] = await Promise.all([
+          apiClient.get(API_ENDPOINTS.EXAMS.BASE),
+          apiClient.get(API_ENDPOINTS.APPLICATIONS.BASE),
+          apiClient.get(API_ENDPOINTS.COURSES.BASE),
+        ]);
+
+        if (isMounted) {
+          setExams(Array.isArray(examsResponse.data) ? examsResponse.data : []);
+          setApplications(Array.isArray(applicationsResponse.data) ? applicationsResponse.data : []);
+          setCourses(Array.isArray(coursesResponse.data) ? coursesResponse.data : []);
+        }
+      } catch (err) {
+        console.error("Failed to load exams:", err);
+        if (isMounted) {
+          setExams([]);
+          setApplications([]);
+          setCourses([]);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const getCourseName = (applicationId) => {
+    const application = applications.find((item) => item.id === applicationId);
+    const courseId = application?.course;
+    const course = courses.find((item) => item.id === courseId);
+    return course?.name || application?.course?.name || "N/A";
+  };
 
   return (
     <div className={styles.container}>
@@ -42,48 +63,46 @@ function Exams() {
         </Link>
       </div>
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Exam</th>
-              <th>Course</th>
-              <th>Duration</th>
-              <th>Questions</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {exams.map((exam) => (
-              <tr key={exam.id}>
-                <td>{exam.title}</td>
-                <td>{exam.course}</td>
-                <td>{exam.duration}</td>
-                <td>{exam.questions}</td>
-
-                <td
-                  className={
-                    exam.status === "Active"
-                      ? styles.active
-                      : exam.status === "Upcoming"
-                      ? styles.upcoming
-                      : styles.completed
-                  }
-                >
-                  {exam.status}
-                </td>
-
-                <td className={styles.actions}>
-                  <Link to="/admin/exam-details">View</Link>
-                  <Link to="/admin/edit-exam">Edit</Link>
-                </td>
+      {loading ? (
+        <p>Loading exams from the database...</p>
+      ) : exams.length === 0 ? (
+        <p>No exams have been created yet.</p>
+      ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Exam</th>
+                <th>Course</th>
+                <th>Duration</th>
+                <th>Questions</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+
+            <tbody>
+              {exams.map((exam) => (
+                <tr key={exam.id}>
+                  <td>{exam.level || "Exam"}</td>
+                  <td>{getCourseName(exam.application)}</td>
+                  <td>{exam.duration_minutes ? `${exam.duration_minutes} mins` : "N/A"}</td>
+                  <td>{Array.isArray(exam.questions) ? exam.questions.length : 0}</td>
+
+                  <td className={exam.status === "PENDING" ? styles.upcoming : exam.status === "SUBMITTED" ? styles.completed : styles.active}>
+                    {exam.status || "PENDING"}
+                  </td>
+
+                  <td className={styles.actions}>
+                    <Link to="/admin/exam-details">View</Link>
+                    <Link to="/admin/edit-exam">Edit</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

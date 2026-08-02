@@ -3,13 +3,17 @@ import { certificateService } from "../../services/certificateService";
 import styles from "./CertificateVerify.module.css";
 
 function CertificateVerify() {
-  const [certId, setCertId] = useState("CERT-2026-001");
+  const [certId, setCertId] = useState("");
   const [certResult, setCertResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleVerify = async () => {
-    if (!certId.trim()) return;
+    if (!certId.trim()) {
+      setError("Please enter a certificate number or code.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setCertResult(null);
@@ -18,9 +22,7 @@ function CertificateVerify() {
       const data = await certificateService.verifyCertificate(certId.trim());
       setCertResult(data);
     } catch (err) {
-      setError(
-        err.response?.data?.detail || "Certificate verification failed or invalid Certificate ID."
-      );
+      setError(err.response?.data?.detail || "Certificate verification failed or the provided ID is invalid.");
     } finally {
       setLoading(false);
     }
@@ -32,38 +34,27 @@ function CertificateVerify() {
         <h1>Certificate Verification</h1>
 
         <p className={styles.subtitle}>
-          Enter the Certificate ID or code to verify its authenticity.
+          Enter the certificate number or code to verify it against the backend database.
         </p>
 
         <div className={styles.form}>
           <input
             type="text"
-            placeholder="Enter Certificate ID"
+            placeholder="Enter Certificate Number or Code"
             value={certId}
             onChange={(e) => setCertId(e.target.value)}
           />
 
-          <button
-            type="button"
-            className={styles.verifyBtn}
-            onClick={handleVerify}
-            disabled={loading}
-          >
+          <button type="button" className={styles.verifyBtn} onClick={handleVerify} disabled={loading}>
             {loading ? "Verifying..." : "Verify"}
           </button>
         </div>
 
-        {error && (
-          <div style={{ color: "red", marginTop: "1rem", fontWeight: "600" }}>
-            ❌ {error}
-          </div>
-        )}
+        {error && <div style={{ color: "red", marginTop: "1rem", fontWeight: "600" }}>❌ {error}</div>}
 
         {certResult && (
           <div className={styles.result}>
-            <h2 className={styles.verified}>
-              ✅ Certificate Verified
-            </h2>
+            <h2 className={styles.verified}>✅ Certificate Verified</h2>
 
             <div className={styles.details}>
               <div className={styles.row}>
@@ -73,7 +64,7 @@ function CertificateVerify() {
 
               <div className={styles.row}>
                 <strong>Course</strong>
-                <span>{certResult.course_title || certResult.course || "N/A"}</span>
+                <span>{certResult.course_name || certResult.course_title || certResult.course || "N/A"}</span>
               </div>
 
               <div className={styles.row}>
@@ -82,13 +73,8 @@ function CertificateVerify() {
               </div>
 
               <div className={styles.row}>
-                <strong>Issue Date</strong>
-                <span>{certResult.issue_date || "N/A"}</span>
-              </div>
-
-              <div className={styles.row}>
                 <strong>Status</strong>
-                <span className={styles.active}>{certResult.status || "VALID"}</span>
+                <span className={styles.active}>{certResult.verified ? "Valid" : "Invalid"}</span>
               </div>
             </div>
           </div>
