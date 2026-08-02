@@ -21,7 +21,7 @@ function AssignmentAdminDetails() {
         <div className={styles.header}>
           <h1>Assignment Details</h1>
 
-          <Link to="/assignments-admin">
+          <Link to="/admin/assignments">
             Back
           </Link>
         </div>
@@ -74,7 +74,7 @@ function AssignmentAdminDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/edit-assignment">
+          <Link to="/admin/edit-assignment">
             Edit Assignment
           </Link>
         </div>

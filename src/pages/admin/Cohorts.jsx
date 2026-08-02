@@ -34,49 +34,51 @@ function Cohorts() {
           <p>Manage all training batches</p>
         </div>
 
-        <Link to="/add-cohort" className={styles.addBtn}>
+        <Link to="/admin/add-cohort" className={styles.addBtn}>
           + Add Cohort
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Cohort</th>
-            <th>Mentor</th>
-            <th>Students</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {cohorts.map((cohort) => (
-            <tr key={cohort.id}>
-              <td>{cohort.name}</td>
-              <td>{cohort.mentor}</td>
-              <td>{cohort.students}</td>
-
-              <td
-                className={
-                  cohort.status === "Active"
-                    ? styles.active
-                    : cohort.status === "Upcoming"
-                    ? styles.upcoming
-                    : styles.completed
-                }
-              >
-                {cohort.status}
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/cohort-details">View</Link>
-                <Link to="/edit-cohort">Edit</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Cohort</th>
+              <th>Mentor</th>
+              <th>Students</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {cohorts.map((cohort) => (
+              <tr key={cohort.id}>
+                <td>{cohort.name}</td>
+                <td>{cohort.mentor}</td>
+                <td>{cohort.students}</td>
+
+                <td
+                  className={
+                    cohort.status === "Active"
+                      ? styles.active
+                      : cohort.status === "Upcoming"
+                      ? styles.upcoming
+                      : styles.completed
+                  }
+                >
+                  {cohort.status}
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/cohort-details">View</Link>
+                  <Link to="/admin/edit-cohort">Edit</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

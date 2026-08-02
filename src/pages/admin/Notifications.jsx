@@ -34,47 +34,49 @@ function Notifications() {
           <p>Manage announcements and notifications</p>
         </div>
 
-        <Link to="/add-notification" className={styles.addBtn}>
+        <Link to="/admin/add-notification" className={styles.addBtn}>
           + Add Notification
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Audience</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {notifications.map((item) => (
-            <tr key={item.id}>
-              <td>{item.title}</td>
-              <td>{item.audience}</td>
-              <td>{item.date}</td>
-
-              <td
-                className={
-                  item.status === "Published"
-                    ? styles.published
-                    : styles.draft
-                }
-              >
-                {item.status}
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/notification-details">View</Link>
-                <Link to="/edit-notification">Edit</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Audience</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {notifications.map((item) => (
+              <tr key={item.id}>
+                <td>{item.title}</td>
+                <td>{item.audience}</td>
+                <td>{item.date}</td>
+
+                <td
+                  className={
+                    item.status === "Published"
+                      ? styles.published
+                      : styles.draft
+                  }
+                >
+                  {item.status}
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/notification-details">View</Link>
+                  <Link to="/admin/edit-notification">Edit</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

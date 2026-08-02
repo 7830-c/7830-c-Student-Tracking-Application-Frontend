@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: #f4f7fb;
+  background: var(--bg-main);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -10,43 +10,51 @@
 .card {
   width: 100%;
   max-width: 1000px;
-  background: #ffffff;
-  border-radius: 18px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
   padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .card h1 {
   text-align: center;
-  color: #1e3a8a;
+  color: var(--primary-dark);
   margin-bottom: 10px;
 }
 
 .subtitle {
   text-align: center;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 35px;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 500px;
 }
 
 .table thead {
-  background: #2563eb;
+  background: var(--primary-color);
   color: white;
 }
 
 .table th,
 .table td {
-  padding: 16px;
+  padding: 14px 16px;
   text-align: center;
   border: 1px solid #e5e7eb;
+  font-size: 14px;
 }
 
 .table tbody tr:nth-child(even) {
-  background: #f8fafc;
+  background: var(--bg-subtle);
 }
 
 .table tbody tr:hover {
@@ -55,20 +63,47 @@
 
 .present {
   display: inline-block;
-  background: #16a34a;
-  color: white;
-  padding: 6px 12px;
+  background: var(--status-active-bg);
+  color: var(--status-active-text);
+  padding: 4px 12px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .absent {
   display: inline-block;
-  background: #dc2626;
-  color: white;
-  padding: 6px 12px;
+  background: var(--status-inactive-bg);
+  color: var(--status-inactive-text);
+  padding: 4px 12px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
+}
+
+.actions {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.button:hover {
+  background: var(--primary-hover);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 20px 15px;
+  }
 }

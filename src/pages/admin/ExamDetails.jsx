@@ -22,7 +22,7 @@ function ExamDetails() {
         <div className={styles.header}>
           <h1>Exam Details</h1>
 
-          <Link to="/exams">
+          <Link to="/admin/exams">
             Back
           </Link>
         </div>
@@ -79,7 +79,7 @@ function ExamDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/edit-exam">
+          <Link to="/admin/edit-exam">
             Edit Exam
           </Link>
         </div>

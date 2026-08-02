@@ -90,7 +90,7 @@ function AddMentor() {
             </button>
 
             <Link
-              to="/mentors"
+              to="/admin/mentors"
               className={styles.cancelBtn}
             >
               Cancel

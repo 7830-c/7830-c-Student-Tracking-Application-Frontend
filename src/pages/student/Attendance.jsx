@@ -13,17 +13,11 @@ function Attendance() {
         </p>
 
         <div className={styles.statusCard}>
-
           <h2>Status</h2>
-
-          <span className={styles.present}>
-            PRESENT
-          </span>
-
+          <span className={styles.present}>PRESENT</span>
         </div>
 
         <div className={styles.sessionCard}>
-
           <div className={styles.item}>
             <h3>Today's Session</h3>
             <p>Java Fundamentals</p>
@@ -38,34 +32,36 @@ function Attendance() {
             <h3>Mentor</h3>
             <p>Rajesh Kumar</p>
           </div>
-
         </div>
 
         <div className={styles.policy}>
-
           <h2>Attendance Policy</h2>
 
           <ul>
             <li>Attendance is mandatory for every internship session.</li>
 
             <li>
-              Missing even one scheduled class may lead to removal from the
-              internship program.
+              Missing even one scheduled class may lead to removal from the internship program.
             </li>
 
             <li>
-              If you cannot attend due to a genuine reason, inform your mentor
-              immediately.
+              If you cannot attend due to a genuine reason, inform your mentor immediately.
             </li>
           </ul>
-
         </div>
 
         <Link
-          to="/attendance-history"
+          to="/student/attendance-history"
           className={styles.button}
         >
           View Attendance History
+        </Link>
+
+        <Link
+          to="/student/assignments"
+          className={styles.button}
+        >
+          Continue to Assignments
         </Link>
 
       </div>

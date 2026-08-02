@@ -21,7 +21,7 @@ function CohortDetails() {
         <div className={styles.header}>
           <h1>Cohort Details</h1>
 
-          <Link to="/cohorts">
+          <Link to="/admin/cohorts">
             Back
           </Link>
         </div>
@@ -73,7 +73,7 @@ function CohortDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/edit-cohort">
+          <Link to="/admin/edit-cohort">
             Edit Cohort
           </Link>
         </div>

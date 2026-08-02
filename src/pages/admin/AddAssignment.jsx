@@ -9,7 +9,7 @@ function AddAssignment() {
         <div className={styles.header}>
           <h1>Add Assignment</h1>
 
-          <Link to="/assignments-admin">
+          <Link to="/admin/assignments">
             Back
           </Link>
         </div>

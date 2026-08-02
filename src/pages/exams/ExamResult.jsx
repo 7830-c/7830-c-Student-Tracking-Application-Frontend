@@ -4,7 +4,7 @@ import styles from "./ExamResult.module.css";
 function ExamResult() {
   const navigate = useNavigate();
 
-  // Dummy result (Backend vachaka API nundi vastundi)
+  // Dummy Result (Later Backend API nundi vastundi)
   const score = 24;
   const total = 30;
   const percentage = Math.round((score / total) * 100);
@@ -23,9 +23,7 @@ function ExamResult() {
             {qualified ? "🎉 Congratulations!" : "Exam Completed"}
           </h2>
 
-          <p>
-            Your Score
-          </p>
+          <p>Your Score</p>
 
           <div className={styles.score}>
             {score} / {total}
@@ -42,9 +40,7 @@ function ExamResult() {
                 : styles.notQualified
             }
           >
-            {qualified
-              ? "QUALIFIED"
-              : "NOT QUALIFIED"}
+            {qualified ? "QUALIFIED" : "NOT QUALIFIED"}
           </div>
 
         </div>
@@ -53,25 +49,33 @@ function ExamResult() {
 
           {qualified ? (
             <p>
-              Congratulations! Your application will now be
-              reviewed for cohort allocation.
+              Congratulations! You have successfully qualified for the internship.
+              You can now access your assigned cohort.
             </p>
           ) : (
             <p>
-              Unfortunately you did not reach the qualifying
-              score. You may apply again when the next
-              screening exam opens.
+              Unfortunately, you did not reach the qualifying score.
+              You may apply again when the next screening exam opens.
             </p>
           )}
 
         </div>
 
-        <button
-          className={styles.button}
-          onClick={() => navigate("/my-applications")}
-        >
-          Back to My Applications
-        </button>
+        {qualified ? (
+          <button
+            className={styles.button}
+            onClick={() => navigate("/student/cohort")}
+          >
+            Go to My Cohort
+          </button>
+        ) : (
+          <button
+            className={styles.button}
+            onClick={() => navigate("/student/applications")}
+          >
+            Back to My Applications
+          </button>
+        )}
 
       </div>
     </div>

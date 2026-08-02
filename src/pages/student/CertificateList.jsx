@@ -49,10 +49,11 @@ function CertificateList() {
               </span>
 
               <Link
-                to="/certificate-view"
+                to="/student/certificate-view"
+                state={{ certificate }}
                 className={styles.button}
               >
-                View Certificate
+                View Certificate →
               </Link>
 
             </div>

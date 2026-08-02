@@ -9,7 +9,7 @@ function UpdateAttendance() {
         <div className={styles.header}>
           <h1>Update Attendance</h1>
 
-          <Link to="/attendance-management">
+          <Link to="/admin/attendance">
             Back
           </Link>
         </div>

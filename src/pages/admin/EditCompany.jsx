@@ -27,7 +27,7 @@ function EditCompany() {
 
     alert("Company Updated Successfully!");
 
-    navigate("/courses");
+    navigate("/admin/companies");
   };
 
   return (

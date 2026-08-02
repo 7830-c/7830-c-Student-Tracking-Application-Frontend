@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./ClassSchedule.module.css";
 
 const schedule = [
@@ -67,6 +68,15 @@ function ClassSchedule() {
           </tbody>
 
         </table>
+
+        <div className={styles.buttons}>
+          <Link
+            to="/student/mentor-details"
+            className={styles.button}
+          >
+            View Mentor Details
+          </Link>
+        </div>
 
       </div>
     </div>

@@ -9,7 +9,7 @@ function EditAssignment() {
         <div className={styles.header}>
           <h1>Edit Assignment</h1>
 
-          <Link to="/assignments-admin">
+          <Link to="/admin/assignments">
             Back
           </Link>
         </div>

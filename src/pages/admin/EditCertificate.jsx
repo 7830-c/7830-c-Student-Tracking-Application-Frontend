@@ -9,7 +9,7 @@ function EditCertificate() {
         <div className={styles.header}>
           <h1>Edit Certificate</h1>
 
-          <Link to="/certificates-admin">
+          <Link to="/admin/certificates">
             Back
           </Link>
         </div>

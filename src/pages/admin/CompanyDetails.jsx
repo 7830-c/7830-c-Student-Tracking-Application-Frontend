@@ -45,11 +45,11 @@ function CompanyDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/edit-company" className={styles.edit}>
+          <Link to="/admin/edit-company" className={styles.edit}>
             Edit Company
           </Link>
 
-          <Link to="/courses" className={styles.back}>
+          <Link to="/admin/companies" className={styles.back}>
             Back
           </Link>
         </div>

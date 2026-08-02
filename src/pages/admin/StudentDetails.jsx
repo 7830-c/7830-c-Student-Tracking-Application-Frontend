@@ -64,14 +64,14 @@ function StudentDetails() {
         <div className={styles.buttons}>
 
           <Link
-            to="/edit-student"
+            to="/admin/edit-student"
             className={styles.edit}
           >
             Edit Student
           </Link>
 
           <Link
-            to="/students"
+            to="/admin/students"
             className={styles.back}
           >
             Back

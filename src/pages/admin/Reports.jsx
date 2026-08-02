@@ -6,17 +6,17 @@ function Reports() {
     {
       title: "Student Report",
       description: "View student performance and enrollment reports.",
-      link: "/student-report",
+      link: "/admin/student-report",
     },
     {
       title: "Course Report",
       description: "Analyze courses, enrollments and completion rate.",
-      link: "/course-report",
+      link: "/admin/course-report",
     },
     {
       title: "Exam Report",
       description: "Monitor exam results and pass percentage.",
-      link: "/exam-report",
+      link: "/admin/exam-report",
     },
   ];
 

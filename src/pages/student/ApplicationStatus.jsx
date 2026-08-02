@@ -58,14 +58,28 @@ function ApplicationStatus() {
         </div>
 
         <Link
-          to="/exam-instructions"
+          to="/student/exam-instructions"
           className={styles.examButton}
         >
           Start Screening Exam
         </Link>
 
         <Link
-          to="/my-applications"
+          to="/student/cohort"
+          className={styles.button}
+        >
+          Continue to My Cohort →
+        </Link>
+
+        <Link
+          to="/student/applications"
+          className={styles.button}
+        >
+          Back to My Applications
+        </Link>
+
+        <Link
+          to="/student/applications"
           className={styles.button}
         >
           Back to My Applications

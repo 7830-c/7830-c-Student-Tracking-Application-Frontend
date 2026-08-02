@@ -34,54 +34,56 @@ function Mentors() {
           <h1>Mentor Management</h1>
 
           <Link
-            to="/add-mentor"
+            to="/admin/add-mentor"
             className={styles.addBtn}
           >
             + Add Mentor
           </Link>
         </div>
 
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Specialization</th>
-              <th>Experience</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {mentors.map((mentor) => (
-              <tr key={mentor.id}>
-                <td>{mentor.id}</td>
-                <td>{mentor.name}</td>
-                <td>{mentor.specialization}</td>
-                <td>{mentor.experience}</td>
-
-                <td>
-                  <span className={styles.status}>
-                    {mentor.status}
-                  </span>
-                </td>
-
-                <td>
-                  <div className={styles.actions}>
-                    <Link to="/mentor-details">
-                      View
-                    </Link>
-
-                    <Link to="/edit-mentor">
-                      Edit
-                    </Link>
-                  </div>
-                </td>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Experience</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {mentors.map((mentor) => (
+                <tr key={mentor.id}>
+                  <td>{mentor.id}</td>
+                  <td>{mentor.name}</td>
+                  <td>{mentor.specialization}</td>
+                  <td>{mentor.experience}</td>
+
+                  <td>
+                    <span className={styles.status}>
+                      {mentor.status}
+                    </span>
+                  </td>
+
+                  <td>
+                    <div className={styles.actions}>
+                      <Link to="/admin/mentor-details">
+                        View
+                      </Link>
+
+                      <Link to="/admin/edit-mentor">
+                        Edit
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
       </div>
     </div>

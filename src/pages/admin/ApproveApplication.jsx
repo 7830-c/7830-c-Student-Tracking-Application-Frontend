@@ -12,7 +12,7 @@ function ApproveApplication() {
 
     alert("Application Approved Successfully!");
 
-    navigate("/applications");
+    navigate("/admin/applications");
   };
 
   return (

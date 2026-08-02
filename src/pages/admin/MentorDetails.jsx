@@ -10,7 +10,7 @@ function MentorDetails() {
           <h1>Mentor Details</h1>
 
           <Link
-            to="/mentors"
+            to="/admin/mentors"
             className={styles.backBtn}
           >
             ← Back
@@ -78,14 +78,14 @@ function MentorDetails() {
         <div className={styles.buttons}>
 
           <Link
-            to="/edit-mentor"
+            to="/admin/edit-mentor"
             className={styles.editBtn}
           >
             Edit Mentor
           </Link>
 
           <Link
-            to="/mentors"
+            to="/admin/mentors"
             className={styles.cancelBtn}
           >
             Back

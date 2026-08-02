@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./AssignmentFeedback.module.css";
 
 function AssignmentFeedback() {
@@ -47,6 +48,13 @@ function AssignmentFeedback() {
           </p>
 
         </div>
+
+        <Link
+          to="/student/certificates"
+          className={styles.button}
+        >
+          Continue to Certificates →
+        </Link>
 
       </div>
     </div>

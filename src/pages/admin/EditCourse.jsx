@@ -88,7 +88,7 @@ function EditCourse() {
             </button>
 
             <Link
-              to="/courses"
+              to="/admin/courses"
               className={styles.cancelBtn}
             >
               Cancel

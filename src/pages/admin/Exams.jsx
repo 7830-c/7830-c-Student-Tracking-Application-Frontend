@@ -37,51 +37,53 @@ function Exams() {
           <p>Manage all screening exams</p>
         </div>
 
-        <Link to="/add-exam" className={styles.addBtn}>
+        <Link to="/admin/add-exam" className={styles.addBtn}>
           + Add Exam
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Exam</th>
-            <th>Course</th>
-            <th>Duration</th>
-            <th>Questions</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {exams.map((exam) => (
-            <tr key={exam.id}>
-              <td>{exam.title}</td>
-              <td>{exam.course}</td>
-              <td>{exam.duration}</td>
-              <td>{exam.questions}</td>
-
-              <td
-                className={
-                  exam.status === "Active"
-                    ? styles.active
-                    : exam.status === "Upcoming"
-                    ? styles.upcoming
-                    : styles.completed
-                }
-              >
-                {exam.status}
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/exam-details">View</Link>
-                <Link to="/edit-exam">Edit</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Exam</th>
+              <th>Course</th>
+              <th>Duration</th>
+              <th>Questions</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {exams.map((exam) => (
+              <tr key={exam.id}>
+                <td>{exam.title}</td>
+                <td>{exam.course}</td>
+                <td>{exam.duration}</td>
+                <td>{exam.questions}</td>
+
+                <td
+                  className={
+                    exam.status === "Active"
+                      ? styles.active
+                      : exam.status === "Upcoming"
+                      ? styles.upcoming
+                      : styles.completed
+                  }
+                >
+                  {exam.status}
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/exam-details">View</Link>
+                  <Link to="/admin/edit-exam">Edit</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

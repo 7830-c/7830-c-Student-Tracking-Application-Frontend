@@ -9,7 +9,7 @@ function SystemSettings() {
         <div className={styles.header}>
           <h1>System Settings</h1>
 
-          <Link to="/settings">
+          <Link to="/admin/settings">
             Back
           </Link>
         </div>

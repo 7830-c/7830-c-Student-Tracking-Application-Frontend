@@ -1,0 +1,98 @@
+.container {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--primary-dark);
+}
+
+.header p {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  min-width: 600px;
+}
+
+.table th {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.table tr:hover td {
+  background: var(--primary-light);
+}
+
+.table a {
+  text-decoration: none;
+  background: var(--primary-color);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.table a:hover {
+  background: var(--primary-hover);
+}
+
+.ongoing {
+  color: var(--status-active-text);
+  background: var(--status-active-bg);
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.upcoming {
+  color: var(--status-pending-text);
+  background: var(--status-pending-bg);
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}

@@ -19,7 +19,7 @@ function NotificationDetails() {
         <div className={styles.header}>
           <h1>Notification Details</h1>
 
-          <Link to="/notifications">
+          <Link to="/admin/notifications">
             Back
           </Link>
         </div>
@@ -61,7 +61,7 @@ function NotificationDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/edit-notification">
+          <Link to="/admin/edit-notification">
             Edit Notification
           </Link>
         </div>

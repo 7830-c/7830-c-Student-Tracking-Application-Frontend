@@ -48,7 +48,7 @@ function MyApplications() {
             </div>
 
             <Link
-              to="/application-status"
+              to="/student/application-status"
               className={styles.button}
             >
               View Status

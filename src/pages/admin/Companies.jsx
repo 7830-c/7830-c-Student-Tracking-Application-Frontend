@@ -34,49 +34,51 @@ function Companies() {
           <p>Manage hiring companies.</p>
         </div>
 
-        <Link to="/add-company" className={styles.addBtn}>
+        <Link to="/admin/add-company" className={styles.addBtn}>
           + Add Company
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Openings</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {companies.map((company) => (
-            <tr key={company.id}>
-              <td>{company.name}</td>
-              <td>{company.location}</td>
-              <td>{company.openings}</td>
-              <td>
-                <span
-                  className={
-                    company.status === "Active"
-                      ? styles.active
-                      : styles.inactive
-                  }
-                >
-                  {company.status}
-                </span>
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/company-details">View</Link>
-
-                <Link to="/edit-company">Edit</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Openings</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {companies.map((company) => (
+              <tr key={company.id}>
+                <td>{company.name}</td>
+                <td>{company.location}</td>
+                <td>{company.openings}</td>
+                <td>
+                  <span
+                    className={
+                      company.status === "Active"
+                        ? styles.active
+                        : styles.inactive
+                    }
+                  >
+                    {company.status}
+                  </span>
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/company-details">View</Link>
+
+                  <Link to="/admin/edit-company">Edit</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,44 +1,46 @@
 .statistics {
-  padding: 80px 8%;
-  background: #f8fbff;
+  padding: 64px 5%;
+  background: #ffffff;
 }
 
 .statistics h2 {
   text-align: center;
-  font-size: 2.5rem;
-  color: #1e3a8a;
-  margin-bottom: 50px;
+  font-size: 2rem;
+  color: var(--primary-dark);
+  margin-bottom: 40px;
 }
 
 .statsContainer {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
+  gap: 24px;
 }
 
 .statCard {
-  background: white;
-  padding: 35px 20px;
-  border-radius: 16px;
+  background: var(--bg-card);
+  padding: 32px 20px;
+  border-radius: var(--radius-md);
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  transition: 0.3s;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .statCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 30px rgba(30,58,138,0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .statCard h3 {
-  font-size: 2.5rem;
-  color: #2563eb;
-  margin-bottom: 10px;
+  font-size: 2.25rem;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+  font-weight: 700;
 }
 
 .statCard p {
-  color: #555;
-  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
   font-weight: 500;
 }
 
@@ -51,5 +53,9 @@
 @media (max-width: 600px) {
   .statsContainer {
     grid-template-columns: 1fr;
+  }
+
+  .statistics {
+    padding: 40px 20px;
   }
 }

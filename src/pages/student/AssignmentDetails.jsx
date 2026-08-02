@@ -54,12 +54,12 @@ function AssignmentDetails() {
 
         </div>
 
-        <Link
-          to="/assignment-submission"
-          className={styles.button}
-        >
-          Submit Assignment
-        </Link>
+       <Link
+        to="/student/assignment-submission"
+        className={styles.button}
+      >
+        Submit Assignment →
+      </Link>
 
       </div>
     </div>

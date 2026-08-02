@@ -26,10 +26,10 @@ function ApplicationSuccess() {
         </div>
 
         <Link
-          to="/apply-course"
+          to="/student/applications"
           className={styles.button}
         >
-          Back to Courses
+          Go to My Applications
         </Link>
 
       </div>

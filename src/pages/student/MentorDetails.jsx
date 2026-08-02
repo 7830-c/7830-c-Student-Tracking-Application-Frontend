@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./MentorDetails.module.css";
 
 function MentorDetails() {
@@ -47,6 +48,7 @@ function MentorDetails() {
 
           <div className={styles.infoBox}>
             <h3>LinkedIn</h3>
+
             <a
               href="https://linkedin.com"
               target="_blank"
@@ -54,8 +56,18 @@ function MentorDetails() {
             >
               View Profile
             </a>
+
           </div>
 
+        </div>
+
+        <div className={styles.buttons}>
+          <Link
+            to="/student/attendance"
+            className={styles.button}
+          >
+            View Attendance
+          </Link>
         </div>
 
       </div>

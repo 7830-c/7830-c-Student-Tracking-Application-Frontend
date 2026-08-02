@@ -37,42 +37,44 @@ function AttendanceHistoryAdmin() {
           <p>Rahul Sharma</p>
         </div>
 
-        <Link to="/attendance-management" className={styles.backBtn}>
+        <Link to="/admin/attendance" className={styles.backBtn}>
           Back
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Check In</th>
-            <th>Check Out</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {history.map((item, index) => (
-            <tr key={index}>
-              <td>{item.date}</td>
-
-              <td
-                className={
-                  item.status === "Present"
-                    ? styles.present
-                    : styles.absent
-                }
-              >
-                {item.status}
-              </td>
-
-              <td>{item.checkIn}</td>
-              <td>{item.checkOut}</td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Check In</th>
+              <th>Check Out</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {history.map((item, index) => (
+              <tr key={index}>
+                <td>{item.date}</td>
+
+                <td
+                  className={
+                    item.status === "Present"
+                      ? styles.present
+                      : styles.absent
+                  }
+                >
+                  {item.status}
+                </td>
+
+                <td>{item.checkIn}</td>
+                <td>{item.checkOut}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

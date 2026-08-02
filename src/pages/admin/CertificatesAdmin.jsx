@@ -34,47 +34,49 @@ function CertificatesAdmin() {
           <p>Manage student certificates</p>
         </div>
 
-        <Link to="/add-certificate" className={styles.addBtn}>
+        <Link to="/admin/add-certificate" className={styles.addBtn}>
           + Add Certificate
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Course</th>
-            <th>Issued On</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {certificates.map((certificate) => (
-            <tr key={certificate.id}>
-              <td>{certificate.student}</td>
-              <td>{certificate.course}</td>
-              <td>{certificate.issued}</td>
-
-              <td
-                className={
-                  certificate.status === "Issued"
-                    ? styles.issued
-                    : styles.pending
-                }
-              >
-                {certificate.status}
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/certificate-admin-details">View</Link>
-                <Link to="/edit-certificate">Edit</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Issued On</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {certificates.map((certificate) => (
+              <tr key={certificate.id}>
+                <td>{certificate.student}</td>
+                <td>{certificate.course}</td>
+                <td>{certificate.issued}</td>
+
+                <td
+                  className={
+                    certificate.status === "Issued"
+                      ? styles.issued
+                      : styles.pending
+                  }
+                >
+                  {certificate.status}
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/certificate-admin-details">View</Link>
+                  <Link to="/admin/edit-certificate">Edit</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

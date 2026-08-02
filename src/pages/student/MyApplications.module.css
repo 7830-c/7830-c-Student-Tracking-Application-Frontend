@@ -1,44 +1,43 @@
 .page {
-  min-height: 100vh;
-  background: #f4f7fc;
-  padding: 50px 20px;
+  width: 100%;
 }
 
 .container {
-  max-width: 900px;
-  margin: auto;
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .header h1 {
-  color: #1e3a8a;
-  font-size: 38px;
-  margin-bottom: 10px;
+  color: var(--primary-dark);
+  font-size: 1.75rem;
+  margin-bottom: 6px;
 }
 
 .header p {
-  color: #6b7280;
-  font-size: 17px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
 .card {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 30px;
-  margin-bottom: 25px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .row:last-of-type {
@@ -46,48 +45,54 @@
 }
 
 .row strong {
-  color: #374151;
+  color: var(--text-primary);
+  font-size: 14px;
 }
 
 .row span {
-  color: #6b7280;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .status {
-  color: #d97706 !important;
+  color: var(--status-pending-text) !important;
   font-weight: 700;
 }
 
 .button {
-  display: inline-block;
-  margin-top: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--button-height);
+  margin-top: 16px;
   text-decoration: none;
-  background: #2563eb;
+  background: var(--primary-color);
   color: #ffffff;
-  padding: 14px 28px;
-  border-radius: 10px;
+  padding: 0 24px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  transition: 0.3s;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
 }
 
 .button:hover {
-  background: #1d4ed8;
+  background: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
-
   .card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 4px;
   }
 
-  .header h1 {
-    font-size: 30px;
+  .button {
+    width: 100%;
   }
-
 }

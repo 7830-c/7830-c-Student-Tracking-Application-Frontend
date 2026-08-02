@@ -1,42 +1,45 @@
 .features {
-  padding: 80px 8%;
-  background: #f8fbff;
+  padding: 64px 5%;
+  background: var(--bg-subtle);
   text-align: center;
 }
 
 .features h2 {
-  font-size: 38px;
-  color: #1e3a8a;
-  margin-bottom: 50px;
+  font-size: 2rem;
+  color: var(--primary-dark);
+  margin-bottom: 40px;
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
+  gap: 24px;
 }
 
 .card {
-  background: white;
-  padding: 30px 20px;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  transition: 0.3s;
+  background: var(--bg-card);
+  padding: 28px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .card h3 {
-  color: #2563eb;
-  margin-bottom: 15px;
-  font-size: 22px;
+  color: var(--primary-color);
+  margin-bottom: 12px;
+  font-size: 1.2rem;
 }
 
 .card p {
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 @media (max-width: 992px) {
@@ -50,7 +53,11 @@
     grid-template-columns: 1fr;
   }
 
+  .features {
+    padding: 40px 20px;
+  }
+
   .features h2 {
-    font-size: 30px;
+    font-size: 1.75rem;
   }
 }

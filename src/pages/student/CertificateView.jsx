@@ -1,65 +1,79 @@
-import { Link } from "react-router-dom";
-import styles from "./CertificateView.module.css";
+import { useNavigate } from "react-router-dom";
+import styles from "./CertificateVerify.module.css";
 
-function CertificateView() {
+function CertificateVerify() {
+  const navigate = useNavigate();
+
+  const handleVerify = () => {
+    alert("✅ Certificate Verified Successfully!");
+
+    setTimeout(() => {
+      navigate("/student/profile");
+    }, 1000);
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
 
-        <h1>Internship Completion Certificate</h1>
+        <h1>Certificate Verification</h1>
 
-        <div className={styles.certificate}>
+        <p className={styles.subtitle}>
+          Enter the Certificate ID to verify its authenticity.
+        </p>
 
-          <h2>Certificate of Completion</h2>
+        <div className={styles.form}>
 
-          <p>
-            This is to certify that
-          </p>
+          <input
+            type="text"
+            placeholder="Enter Certificate ID"
+            defaultValue="CERT-2026-001"
+          />
 
-          <h3>Somesh Kumar Srinadha</h3>
-
-          <p>
-            has successfully completed the
-          </p>
-
-          <h4>Java Full Stack Development Internship</h4>
-
-          <p>
-            conducted by Sure Trust.
-          </p>
-
-          <div className={styles.details}>
-
-            <div>
-              <strong>Certificate ID</strong>
-              <p>CERT-2026-001</p>
-            </div>
-
-            <div>
-              <strong>Issue Date</strong>
-              <p>20 Aug 2026</p>
-            </div>
-
-          </div>
-
-          <div className={styles.qr}>
-            QR CODE
-          </div>
+          <button
+            type="button"
+            className={styles.verifyBtn}
+            onClick={handleVerify}
+          >
+            Verify Certificate
+          </button>
 
         </div>
 
-        <div className={styles.actions}>
+        <div className={styles.result}>
 
-          <button className={styles.download}>
-            Download PDF
-          </button>
+          <h2 className={styles.verified}>
+            ✅ Certificate Verified
+          </h2>
 
-          <Link
-            to="/certificate-verify"
-            className={styles.verify}
-          >
-            Verify Certificate
-          </Link>
+          <div className={styles.details}>
+
+            <div className={styles.row}>
+              <strong>Student Name</strong>
+              <span>Somesh Kumar Srinadha</span>
+            </div>
+
+            <div className={styles.row}>
+              <strong>Course</strong>
+              <span>Java Full Stack Development</span>
+            </div>
+
+            <div className={styles.row}>
+              <strong>Certificate ID</strong>
+              <span>CERT-2026-001</span>
+            </div>
+
+            <div className={styles.row}>
+              <strong>Issue Date</strong>
+              <span>20 Aug 2026</span>
+            </div>
+
+            <div className={styles.row}>
+              <strong>Status</strong>
+              <span className={styles.active}>Valid</span>
+            </div>
+
+          </div>
 
         </div>
 
@@ -68,4 +82,4 @@ function CertificateView() {
   );
 }
 
-export default CertificateView;
+export default CertificateVerify;

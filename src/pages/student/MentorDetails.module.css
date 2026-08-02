@@ -68,3 +68,22 @@
   color: #2563eb;
   text-decoration: underline;
 }
+.buttons{
+    margin-top:30px;
+    display:flex;
+    justify-content:flex-end;
+}
+
+.button{
+    background:#2563eb;
+    color:#fff;
+    text-decoration:none;
+    padding:12px 24px;
+    border-radius:8px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.button:hover{
+    background:#1d4ed8;
+}

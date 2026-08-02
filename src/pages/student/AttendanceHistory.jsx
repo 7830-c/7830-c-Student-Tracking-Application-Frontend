@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./AttendanceHistory.module.css";
 
 const attendanceData = [
@@ -44,39 +45,50 @@ function AttendanceHistory() {
           View your attendance records for all internship sessions.
         </p>
 
-        <table className={styles.table}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
 
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Subject</th>
-              <th>Time</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {attendanceData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.date}</td>
-                <td>{item.subject}</td>
-                <td>{item.time}</td>
-                <td>
-                  <span
-                    className={
-                      item.status === "Present"
-                        ? styles.present
-                        : styles.absent
-                    }
-                  >
-                    {item.status}
-                  </span>
-                </td>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Time</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody>
+              {attendanceData.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.date}</td>
+                  <td>{item.subject}</td>
+                  <td>{item.time}</td>
+                  <td>
+                    <span
+                      className={
+                        item.status === "Present"
+                          ? styles.present
+                          : styles.absent
+                      }
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+        </div>
+
+        <div className={styles.actions}>
+          <Link
+            to="/student/assignments"
+            className={styles.button}
+          >
+            Continue to Assignments →
+          </Link>
+        </div>
 
       </div>
     </div>

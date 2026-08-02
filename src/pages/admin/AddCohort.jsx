@@ -9,7 +9,7 @@ function AddCohort() {
         <div className={styles.header}>
           <h1>Add New Cohort</h1>
 
-          <Link to="/cohorts">
+          <Link to="/admin/cohorts">
             Back
           </Link>
         </div>

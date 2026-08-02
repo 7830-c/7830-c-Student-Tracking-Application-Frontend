@@ -49,22 +49,27 @@ function MyCohort() {
         <div className={styles.buttons}>
 
           <Link
-            to="/class-schedule"
+            to="/student/class-schedule"
             className={styles.button}
           >
             View Class Schedule
           </Link>
 
           <Link
-            to="/mentor"
+            to="/student/mentor-details"
             className={styles.button}
           >
             Mentor Details
           </Link>
 
-          <button className={styles.meetButton}>
+          <a
+            href="https://meet.google.com/"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.meetButton}
+          >
             Join Meeting
-          </button>
+          </a>
 
         </div>
 

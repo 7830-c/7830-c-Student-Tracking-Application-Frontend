@@ -36,45 +36,47 @@ function Courses() {
         <div className={styles.header}>
           <h1>Course Management</h1>
 
-          <Link to="/add-course" className={styles.addBtn}>
+          <Link to="/admin/add-course" className={styles.addBtn}>
             + Add Course
           </Link>
         </div>
 
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Duration</th>
-              <th>Mentor</th>
-              <th>Students</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {courses.map((course) => (
-              <tr key={course.id}>
-                <td>{course.title}</td>
-                <td>{course.duration}</td>
-                <td>{course.mentor}</td>
-                <td>{course.students}</td>
-                <td>
-                  <span className={styles.status}>
-                    {course.status}
-                  </span>
-                </td>
-
-                <td className={styles.actions}>
-                  <Link to="/course-details">View</Link>
-
-                  <Link to="/edit-course">Edit</Link>
-                </td>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Duration</th>
+                <th>Mentor</th>
+                <th>Students</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {courses.map((course) => (
+                <tr key={course.id}>
+                  <td>{course.title}</td>
+                  <td>{course.duration}</td>
+                  <td>{course.mentor}</td>
+                  <td>{course.students}</td>
+                  <td>
+                    <span className={styles.status}>
+                      {course.status}
+                    </span>
+                  </td>
+
+                  <td className={styles.actions}>
+                    <Link to="/admin/course-details">View</Link>
+
+                    <Link to="/admin/edit-course">Edit</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
       </div>
     </div>

@@ -27,7 +27,7 @@ function AddCompany() {
 
     alert("Company Added Successfully!");
 
-    navigate("/courses");
+    navigate("/admin/companies");
   };
 
   return (

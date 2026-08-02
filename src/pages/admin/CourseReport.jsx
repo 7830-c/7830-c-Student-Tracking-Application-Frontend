@@ -14,7 +14,7 @@ function CourseReport() {
       <div className={styles.header}>
         <h1>Course Report</h1>
 
-        <Link to="/reports">
+        <Link to="/admin/reports">
           Back
         </Link>
       </div>

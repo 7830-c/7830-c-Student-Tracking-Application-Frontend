@@ -34,47 +34,49 @@ function AttendanceManagement() {
           <p>Manage daily attendance records</p>
         </div>
 
-        <Link to="/update-attendance" className={styles.addBtn}>
+        <Link to="/admin/update-attendance" className={styles.addBtn}>
           + Update Attendance
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Cohort</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {attendance.map((item) => (
-            <tr key={item.id}>
-              <td>{item.student}</td>
-              <td>{item.cohort}</td>
-              <td>{item.date}</td>
-
-              <td
-                className={
-                  item.status === "Present"
-                    ? styles.present
-                    : styles.absent
-                }
-              >
-                {item.status}
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/attendance-details">View</Link>
-                <Link to="/attendance-history-admin">History</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Cohort</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {attendance.map((item) => (
+              <tr key={item.id}>
+                <td>{item.student}</td>
+                <td>{item.cohort}</td>
+                <td>{item.date}</td>
+
+                <td
+                  className={
+                    item.status === "Present"
+                      ? styles.present
+                      : styles.absent
+                  }
+                >
+                  {item.status}
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/attendance-details">View</Link>
+                  <Link to="/admin/attendance-history-admin">History</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

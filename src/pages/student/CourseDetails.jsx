@@ -62,7 +62,7 @@ function CourseDetails() {
 
         <button
           className={styles.applyBtn}
-          onClick={() => navigate("/application-success")}
+          onClick={() => navigate("/student/application-success")}
         >
           Apply for this Course
         </button>

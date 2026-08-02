@@ -2,103 +2,155 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-
+  height: var(--navbar-height);
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  padding: 18px 8%;
-
-  background: rgba(255, 255, 255, 0.9);
+  padding: 0 5%;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .logo {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #1e3a8a;
+  color: var(--primary-dark);
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--primary-dark);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.navContent {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
 
 .menu {
   display: flex;
   list-style: none;
-  gap: 32px;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
 }
 
 .menu a {
   text-decoration: none;
-  color: #374151;
+  color: var(--text-secondary);
   font-weight: 600;
-  transition: 0.3s;
+  font-size: 14px;
+  transition: color var(--transition-fast);
 }
 
 .menu a:hover {
-  color: #2563eb;
+  color: var(--primary-color);
 }
-
-/* Right Side Buttons */
 
 .buttons {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .signupBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--button-height);
+  padding: 0 20px;
+  border-radius: var(--radius-md);
   text-decoration: none;
-  color: #2563eb;
-  border: 2px solid #2563eb;
-  padding: 11px 22px;
-  border-radius: 50px;
+  color: var(--primary-color);
+  border: 1.5px solid var(--primary-color);
   font-weight: 600;
-  transition: .3s;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  background: transparent;
 }
 
 .signupBtn:hover {
-  background: #2563eb;
-  color: white;
+  background: var(--primary-light);
+  color: var(--primary-color);
 }
 
 .loginBtn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-
+  height: var(--button-height);
+  padding: 0 20px;
+  border-radius: var(--radius-md);
   text-decoration: none;
-
-  background: #2563eb;
-  color: white;
-
-  padding: 12px 22px;
-  border-radius: 50px;
-
+  background: var(--primary-color);
+  color: #ffffff;
   font-weight: 600;
-  transition: .3s;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  border: 1.5px solid var(--primary-color);
+  cursor: pointer;
 }
 
 .loginBtn:hover {
-  background: #1d4ed8;
-  transform: translateY(-2px);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
-@media (max-width:768px){
-
-  .navbar{
-    flex-direction:column;
-    gap:20px;
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
   }
 
-  .menu{
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:18px;
+  .hamburger {
+    display: flex;
+    align-items: center;
   }
 
-  .buttons{
-    width:100%;
-    justify-content:center;
+  .navContent {
+    position: absolute;
+    top: var(--navbar-height);
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    box-shadow: var(--shadow-md);
+    border-bottom: 1px solid var(--border-color);
+    display: none;
+  }
+
+  .mobileOpen {
+    display: flex !important;
+  }
+
+  .menu {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .signupBtn,
+  .loginBtn {
+    width: 100%;
+    text-align: center;
   }
 }

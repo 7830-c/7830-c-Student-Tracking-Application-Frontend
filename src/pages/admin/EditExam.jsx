@@ -29,7 +29,7 @@ function EditExam() {
 
     alert("Exam Updated Successfully!");
 
-    navigate("/exams");
+    navigate("/admin/exams");
   };
 
   return (

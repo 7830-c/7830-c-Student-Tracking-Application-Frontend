@@ -14,7 +14,7 @@ function ExamReport() {
       <div className={styles.header}>
         <h1>Exam Report</h1>
 
-        <Link to="/reports">
+        <Link to="/admin/reports">
           Back
         </Link>
       </div>

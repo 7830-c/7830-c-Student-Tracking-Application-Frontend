@@ -1,153 +1,145 @@
 .coursePage {
-  min-height: 100vh;
-  background: #f4f7fb;
-  padding: 60px 30px;
+  width: 100%;
 }
 
 .container {
-  max-width: 1300px;
-  margin: auto;
+  width: 100%;
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 50px;
+  text-align: left;
+  margin-bottom: 32px;
 }
 
 .header h1 {
-  font-size: 42px;
-  color: #1e3a8a;
-  margin-bottom: 12px;
+  font-size: 1.75rem;
+  color: var(--primary-dark);
+  margin-bottom: 6px;
 }
 
 .header p {
-  max-width: 750px;
-  margin: auto;
-  color: #6b7280;
-  font-size: 17px;
-  line-height: 1.7;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
 .courseGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
 }
 
 .courseCard {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 30px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-  transition: 0.3s;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   display: flex;
   flex-direction: column;
 }
 
 .courseCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.15);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 .badge {
-  display: inline-block;
+  display: inline-flex;
   width: fit-content;
-  padding: 6px 14px;
-  background: #dcfce7;
-  color: #15803d;
-  border-radius: 30px;
-  font-size: 13px;
+  padding: 4px 10px;
+  background: var(--status-active-bg);
+  color: var(--status-active-text);
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: 600;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .courseCard h2 {
-  color: #1e3a8a;
-  margin-bottom: 15px;
-  font-size: 24px;
+  color: var(--primary-dark);
+  margin-bottom: 10px;
+  font-size: 1.25rem;
 }
 
 .courseCard p {
-  color: #6b7280;
-  line-height: 1.7;
-  margin-bottom: 25px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
 }
 
 .info {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-bottom: 30px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .info div {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 14px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
 }
 
 .info strong {
   display: block;
-  color: #374151;
-  font-size: 14px;
-  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-bottom: 4px;
 }
 
 .info span {
-  color: #2563eb;
+  color: var(--primary-color);
   font-weight: 600;
+  font-size: 14px;
 }
 
 .buttons {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   margin-top: auto;
 }
 
 .detailsBtn,
 .applyBtn {
   flex: 1;
-  text-align: center;
-  padding: 14px;
-  border-radius: 10px;
-  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--button-height);
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all var(--transition-fast);
+  text-decoration: none;
 }
 
 .detailsBtn {
-  text-decoration: none;
-  border: 2px solid #2563eb;
-  color: #2563eb;
-  background: white;
+  border: 1.5px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
 }
 
 .detailsBtn:hover {
-  background: #2563eb;
-  color: white;
+  background: var(--primary-light);
 }
 
 .applyBtn {
-  border: none;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
+  border: 1.5px solid var(--primary-color);
+  background: var(--primary-color);
+  color: #ffffff;
 }
 
 .applyBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
-  .coursePage {
-    padding: 40px 20px;
-  }
-
-  .header h1 {
-    font-size: 32px;
-  }
-
   .info {
     grid-template-columns: 1fr;
   }

@@ -46,7 +46,7 @@ function Students() {
           </div>
 
           <Link
-            to="/add-student"
+            to="/admin/add-student"
             className={styles.addButton}
           >
             + Add Student
@@ -70,69 +70,71 @@ function Students() {
 
         </div>
 
-        <table className={styles.table}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
 
-          <thead>
+            <thead>
 
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Course</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {students.map((student) => (
-
-              <tr key={student.id}>
-
-                <td>{student.name}</td>
-
-                <td>{student.email}</td>
-
-                <td>{student.course}</td>
-
-                <td>
-
-                  <span
-                    className={
-                      student.status === "Active"
-                        ? styles.active
-                        : styles.inactive
-                    }
-                  >
-                    {student.status}
-                  </span>
-
-                </td>
-
-                <td className={styles.actions}>
-
-                  <Link to="/student-details">
-                    View
-                  </Link>
-
-                  <Link to="/edit-student">
-                    Edit
-                  </Link>
-
-                  <button>
-                    Delete
-                  </button>
-
-                </td>
-
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {students.map((student) => (
+
+                <tr key={student.id}>
+
+                  <td>{student.name}</td>
+
+                  <td>{student.email}</td>
+
+                  <td>{student.course}</td>
+
+                  <td>
+
+                    <span
+                      className={
+                        student.status === "Active"
+                          ? styles.active
+                          : styles.inactive
+                      }
+                    >
+                      {student.status}
+                    </span>
+
+                  </td>
+
+                  <td className={styles.actions}>
+
+                    <Link to="/admin/student-details">
+                      View
+                    </Link>
+
+                    <Link to="/admin/edit-student">
+                      Edit
+                    </Link>
+
+                    <button>
+                      Delete
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+        </div>
 
       </div>
 

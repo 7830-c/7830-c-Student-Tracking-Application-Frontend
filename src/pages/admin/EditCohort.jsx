@@ -9,7 +9,7 @@ function EditCohort() {
         <div className={styles.header}>
           <h1>Edit Cohort</h1>
 
-          <Link to="/cohorts">
+          <Link to="/admin/cohorts">
             Back
           </Link>
         </div>

@@ -9,7 +9,7 @@ function CourseDetails() {
         <div className={styles.header}>
           <h1>Course Details</h1>
 
-          <Link to="/courses" className={styles.backBtn}>
+          <Link to="/admin/courses" className={styles.backBtn}>
             ← Back
           </Link>
         </div>
@@ -77,14 +77,14 @@ function CourseDetails() {
         <div className={styles.buttons}>
 
           <Link
-            to="/edit-course"
+            to="/admin/edit-course"
             className={styles.editBtn}
           >
             Edit Course
           </Link>
 
           <Link
-            to="/courses"
+            to="/admin/courses"
             className={styles.cancelBtn}
           >
             Back to Courses

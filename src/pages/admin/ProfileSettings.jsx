@@ -9,7 +9,7 @@ function ProfileSettings() {
         <div className={styles.header}>
           <h1>Profile Settings</h1>
 
-          <Link to="/settings">
+          <Link to="/admin/settings">
             Back
           </Link>
         </div>

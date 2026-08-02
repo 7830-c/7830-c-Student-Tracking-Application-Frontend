@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./ApplyCourse.module.css";
 
 const courses = [
@@ -35,6 +35,11 @@ const courses = [
 ];
 
 function ApplyCourse() {
+  const location = useLocation();
+
+  const profileCompleted =
+    location.state?.profileCompleted || false;
+
   return (
     <div className={styles.coursePage}>
       <div className={styles.container}>
@@ -51,9 +56,14 @@ function ApplyCourse() {
         <div className={styles.courseGrid}>
 
           {courses.map((course) => (
-            <div key={course.id} className={styles.courseCard}>
+            <div
+              key={course.id}
+              className={styles.courseCard}
+            >
 
-              <span className={styles.badge}>Published</span>
+              <span className={styles.badge}>
+                Published
+              </span>
 
               <h2>{course.name}</h2>
 
@@ -85,12 +95,23 @@ function ApplyCourse() {
 
               <div className={styles.buttons}>
 
-                <Link
-                  to={`/course/${course.id}`}
-                  className={styles.detailsBtn}
-                >
-                  View Details
-                </Link>
+                {profileCompleted ? (
+                  <Link
+                    to={`/student/course/${course.id}`}
+                    className={styles.detailsBtn}
+                  >
+                    View Details
+                  </Link>
+                ) : (
+                  <button
+                    className={styles.detailsBtn}
+                    onClick={() =>
+                      alert("Please complete your profile first.")
+                    }
+                  >
+                    Complete Profile First
+                  </button>
+                )}
 
               </div>
 

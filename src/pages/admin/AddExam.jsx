@@ -28,7 +28,7 @@ function AddExam() {
 
     alert("Exam Added Successfully!");
 
-    navigate("/exams");
+    navigate("/admin/exams");
   };
 
   return (

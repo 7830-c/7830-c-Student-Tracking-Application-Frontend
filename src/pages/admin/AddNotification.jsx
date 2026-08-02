@@ -9,7 +9,7 @@ function AddNotification() {
         <div className={styles.header}>
           <h1>Add Notification</h1>
 
-          <Link to="/notifications">
+          <Link to="/admin/notifications">
             Back
           </Link>
         </div>

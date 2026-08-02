@@ -46,17 +46,89 @@
 .subtitle {
   color: #6b7280;
   line-height: 1.7;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.loginBtn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.loginBtn:hover {
+  background: #1d4ed8;
+}
+
+.loginBtn:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 18px 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.divider span {
+  padding: 0 10px;
 }
 
 .linkedinBtn {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   border: none;
   border-radius: 10px;
   background: #0a66c2;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 
@@ -73,8 +145,8 @@
 }
 
 .infoBox {
-  margin-top: 30px;
-  margin-bottom: 30px;
+  margin-top: 25px;
+  margin-bottom: 25px;
 
   text-align: left;
 
@@ -119,7 +191,7 @@
 
 .homeLink {
   display: inline-block;
-  margin-top: 25px;
+  margin-top: 20px;
   color: #6b7280;
   text-decoration: none;
 }
@@ -156,16 +228,17 @@
     max-width: 430px;
   }
 }
+
 .forgotPassword {
   text-align: right;
-  margin: 12px 0 20px;
+  margin: 6px 0 14px;
 }
 
 .forgotPassword a {
   text-decoration: none;
   color: #2563eb;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .forgotPassword a:hover {

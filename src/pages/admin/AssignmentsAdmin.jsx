@@ -37,51 +37,53 @@ function AssignmentsAdmin() {
           <p>Manage all assignments</p>
         </div>
 
-        <Link to="/add-assignment" className={styles.addBtn}>
+        <Link to="/admin/add-assignment" className={styles.addBtn}>
           + Add Assignment
         </Link>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Assignment</th>
-            <th>Course</th>
-            <th>Due Date</th>
-            <th>Submissions</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {assignments.map((assignment) => (
-            <tr key={assignment.id}>
-              <td>{assignment.title}</td>
-              <td>{assignment.course}</td>
-              <td>{assignment.dueDate}</td>
-              <td>{assignment.submissions}</td>
-
-              <td
-                className={
-                  assignment.status === "Active"
-                    ? styles.active
-                    : assignment.status === "Upcoming"
-                    ? styles.upcoming
-                    : styles.completed
-                }
-              >
-                {assignment.status}
-              </td>
-
-              <td className={styles.actions}>
-                <Link to="/assignment-admin-details">View</Link>
-                <Link to="/edit-assignment">Edit</Link>
-              </td>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Assignment</th>
+              <th>Course</th>
+              <th>Due Date</th>
+              <th>Submissions</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {assignments.map((assignment) => (
+              <tr key={assignment.id}>
+                <td>{assignment.title}</td>
+                <td>{assignment.course}</td>
+                <td>{assignment.dueDate}</td>
+                <td>{assignment.submissions}</td>
+
+                <td
+                  className={
+                    assignment.status === "Active"
+                      ? styles.active
+                      : assignment.status === "Upcoming"
+                      ? styles.upcoming
+                      : styles.completed
+                  }
+                >
+                  {assignment.status}
+                </td>
+
+                <td className={styles.actions}>
+                  <Link to="/admin/assignment-admin-details">View</Link>
+                  <Link to="/admin/edit-assignment">Edit</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,17 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./AssignmentSubmission.module.css";
 
 function AssignmentSubmission() {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    alert("Assignment Submitted Successfully ✅");
+
+    navigate("/student/assignment-feedback");
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
@@ -12,13 +22,17 @@ function AssignmentSubmission() {
           Upload your completed assignment before the deadline.
         </p>
 
-        <form className={styles.form}>
+        <form
+          className={styles.form}
+          onSubmit={handleSubmit}
+        >
 
           <div className={styles.group}>
             <label>Assignment File</label>
 
             <input
               type="file"
+              required
             />
           </div>
 
@@ -28,6 +42,7 @@ function AssignmentSubmission() {
             <input
               type="url"
               placeholder="https://github.com/username/project"
+              required
             />
           </div>
 
@@ -48,13 +63,6 @@ function AssignmentSubmission() {
           </button>
 
         </form>
-
-        <Link
-          to="/assignment-feedback"
-          className={styles.back}
-        >
-          View Feedback
-        </Link>
 
       </div>
     </div>

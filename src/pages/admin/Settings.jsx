@@ -12,17 +12,17 @@ function Settings() {
 
       <div className={styles.grid}>
 
-        <Link to="/profile-settings" className={styles.card}>
+        <Link to="/admin/profile-settings" className={styles.card}>
           <h2>Profile Settings</h2>
           <p>Update admin profile information.</p>
         </Link>
 
-        <Link to="/security-settings" className={styles.card}>
+        <Link to="/admin/security-settings" className={styles.card}>
           <h2>Security Settings</h2>
           <p>Change password and security options.</p>
         </Link>
 
-        <Link to="/system-settings" className={styles.card}>
+        <Link to="/admin/system-settings" className={styles.card}>
           <h2>System Settings</h2>
           <p>Configure application settings.</p>
         </Link>

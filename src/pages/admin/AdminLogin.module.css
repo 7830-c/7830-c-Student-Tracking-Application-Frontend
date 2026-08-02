@@ -1,0 +1,84 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.card {
+  width: 100%;
+  max-width: 450px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.card h1 {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.card p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.group input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.group input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 5px rgba(37,99,235,.3);
+}
+
+.button {
+  width: 100%;
+  padding: 14px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width:600px){
+
+.card{
+padding:25px;
+}
+
+.card h1{
+font-size:28px;
+}
+
+}

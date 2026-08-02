@@ -19,7 +19,7 @@ function AttendanceDetails() {
         <div className={styles.header}>
           <h1>Attendance Details</h1>
 
-          <Link to="/attendance-management">
+          <Link to="/admin/attendance">
             Back
           </Link>
         </div>
@@ -66,7 +66,7 @@ function AttendanceDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/update-attendance">
+          <Link to="/admin/update-attendance">
             Update Attendance
           </Link>
         </div>

@@ -20,7 +20,7 @@ function ApplicationDetails() {
         <div className={styles.header}>
           <h1>Application Details</h1>
 
-          <Link to="/applications">
+          <Link to="/admin/applications">
             Back
           </Link>
         </div>
@@ -72,11 +72,11 @@ function ApplicationDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/approve-application">
+          <Link to="/admin/approve-application">
             Approve
           </Link>
 
-          <Link to="/reject-application">
+          <Link to="/admin/reject-application">
             Reject
           </Link>
         </div>

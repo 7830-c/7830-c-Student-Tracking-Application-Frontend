@@ -12,7 +12,7 @@ function RejectApplication() {
 
     alert("Application Rejected Successfully!");
 
-    navigate("/applications");
+    navigate("/admin/applications");
   };
 
   return (

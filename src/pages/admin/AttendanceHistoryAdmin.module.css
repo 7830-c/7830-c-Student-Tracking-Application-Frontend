@@ -1,7 +1,7 @@
 .container {
   padding: 40px;
   min-height: 100vh;
-  background: #f4f7fb;
+  background: var(--bg-main);
 }
 
 .header {
@@ -13,58 +13,85 @@
 
 .header h1 {
   margin: 0;
-  color: #1f2937;
+  color: var(--primary-dark);
 }
 
 .header p {
   margin-top: 6px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .backBtn {
   text-decoration: none;
-  background: #2563eb;
+  background: var(--primary-color);
   color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
   font-weight: 600;
+  font-size: 14px;
+  transition: 0.3s;
 }
 
 .backBtn:hover {
-  background: #1d4ed8;
+  background: var(--primary-hover);
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+  box-shadow: var(--shadow-md);
+  min-width: 500px;
 }
 
 .table th {
-  background: #2563eb;
+  background: var(--primary-color);
   color: white;
-  padding: 16px;
+  padding: 14px 16px;
   text-align: left;
+  font-size: 14px;
 }
 
 .table td {
-  padding: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
 }
 
 .table tr:hover {
-  background: #f9fafb;
+  background: var(--bg-subtle);
 }
 
 .present {
-  color: #16a34a;
+  color: var(--status-active-text);
+  background: var(--status-active-bg);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: 600;
+  display: inline-block;
 }
 
 .absent {
-  color: #dc2626;
+  color: var(--status-inactive-text);
+  background: var(--status-inactive-bg);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: 600;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
 }

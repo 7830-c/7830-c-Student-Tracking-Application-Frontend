@@ -20,7 +20,7 @@ function CertificateAdminDetails() {
         <div className={styles.header}>
           <h1>Certificate Details</h1>
 
-          <Link to="/certificates-admin">
+          <Link to="/admin/certificates">
             Back
           </Link>
         </div>
@@ -67,7 +67,7 @@ function CertificateAdminDetails() {
         </div>
 
         <div className={styles.buttons}>
-          <Link to="/edit-certificate">
+          <Link to="/admin/edit-certificate">
             Edit Certificate
           </Link>
         </div>

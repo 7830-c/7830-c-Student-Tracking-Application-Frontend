@@ -10,8 +10,8 @@ const questions = [
       "Programming Language",
       "Database",
       "Operating System",
-      "Browser"
-    ]
+      "Browser",
+    ],
   },
   {
     id: 2,
@@ -20,8 +20,8 @@ const questions = [
       "Python",
       "CSS",
       "Java",
-      "C++"
-    ]
+      "C++",
+    ],
   },
   {
     id: 3,
@@ -30,39 +30,39 @@ const questions = [
       "Database",
       "JavaScript Library",
       "Compiler",
-      "Operating System"
-    ]
-  }
+      "Operating System",
+    ],
+  },
 ];
 
 function Exam() {
   const navigate = useNavigate();
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
-
   const [answers, setAnswers] = useState({});
 
   const handleOptionSelect = (option) => {
-    setAnswers({
-      ...answers,
+    setAnswers((prev) => ({
+      ...prev,
       [currentQuestion]: option,
-    });
+    }));
   };
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+      setCurrentQuestion((prev) => prev + 1);
     }
   };
 
   const previousQuestion = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
+      setCurrentQuestion((prev) => prev - 1);
     }
   };
 
   const submitExam = () => {
-    navigate("/exam-result");
+    alert("Exam Submitted Successfully ✅");
+    navigate("/student/exam-result");
   };
 
   return (
@@ -80,9 +80,7 @@ function Exam() {
         </div>
 
         <div className={styles.questionSection}>
-          <h3>
-            {questions[currentQuestion].question}
-          </h3>
+          <h3>{questions[currentQuestion].question}</h3>
 
           <div className={styles.options}>
             {questions[currentQuestion].options.map((option) => (
@@ -92,14 +90,10 @@ function Exam() {
               >
                 <input
                   type="radio"
-                  name="answer"
+                  name={`question-${currentQuestion}`}
                   value={option}
-                  checked={
-                    answers[currentQuestion] === option
-                  }
-                  onChange={() =>
-                    handleOptionSelect(option)
-                  }
+                  checked={answers[currentQuestion] === option}
+                  onChange={() => handleOptionSelect(option)}
                 />
 
                 {option}
@@ -109,8 +103,8 @@ function Exam() {
         </div>
 
         <div className={styles.buttons}>
-
           <button
+            type="button"
             onClick={previousQuestion}
             disabled={currentQuestion === 0}
           >
@@ -119,18 +113,19 @@ function Exam() {
 
           {currentQuestion === questions.length - 1 ? (
             <button
+              type="button"
               onClick={submitExam}
             >
               Submit Exam
             </button>
           ) : (
             <button
+              type="button"
               onClick={nextQuestion}
             >
               Next
             </button>
           )}
-
         </div>
 
       </div>

@@ -55,7 +55,7 @@ function AddStudent() {
               Save Student
             </button>
 
-            <Link to="/students">
+            <Link to="/admin/students">
               Cancel
             </Link>
 

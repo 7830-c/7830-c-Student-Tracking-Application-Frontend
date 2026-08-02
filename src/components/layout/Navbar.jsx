@@ -1,28 +1,76 @@
+import { useState } from "react";
 import styles from "./Navbar.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 function Navbar() {
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setMobileOpen(false);
+    navigate("/");
+  };
+
+  const getDashboardPath = () => {
+    if (user?.role === "ADMIN") return "/admin/dashboard";
+    if (user?.role === "MENTOR") return "/mentor/dashboard";
+    return "/student/profile";
+  };
+
+  const closeMenu = () => setMobileOpen(false);
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.logo}>
-        Sure ProEd
+        <Link to="/" onClick={closeMenu} style={{ textDecoration: "none", color: "inherit" }}>
+          Sure ProEd
+        </Link>
       </div>
 
-      <ul className={styles.menu}>
-        <li><a href="/">Home</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#statistics">Statistics</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
+      <button
+        className={styles.hamburger}
+        onClick={() => setMobileOpen(!mobileOpen)}
+        aria-label="Toggle menu"
+      >
+        {mobileOpen ? <FaTimes /> : <FaBars />}
+      </button>
 
-      <div className={styles.buttons}>
-        <Link to="/signup" className={styles.signupBtn}>
-          Sign Up
-        </Link>
+      <div className={`${styles.navContent} ${mobileOpen ? styles.mobileOpen : ""}`}>
+        <ul className={styles.menu}>
+          <li><Link to="/" onClick={closeMenu}>Home</Link></li>
+          <li><a href="/#features" onClick={closeMenu}>Features</a></li>
+          <li><a href="/#statistics" onClick={closeMenu}>Statistics</a></li>
+          {isAuthenticated && (
+            <li><Link to={getDashboardPath()} onClick={closeMenu}>Dashboard</Link></li>
+          )}
+        </ul>
 
-        <Link to="/login" className={styles.loginBtn}>
-          Student Login
-        </Link>
+        <div className={styles.buttons}>
+          {isAuthenticated ? (
+            <>
+              <Link to={getDashboardPath()} onClick={closeMenu} className={styles.signupBtn}>
+                My Account
+              </Link>
+              <button onClick={handleLogout} className={styles.loginBtn} style={{ cursor: "pointer", border: "none" }}>
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/signup" onClick={closeMenu} className={styles.signupBtn}>
+                Sign Up
+              </Link>
+
+              <Link to="/login" onClick={closeMenu} className={styles.loginBtn}>
+                Student Login
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );

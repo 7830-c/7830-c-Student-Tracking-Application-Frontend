@@ -57,14 +57,24 @@ function AssignmentList() {
               </span>
 
               <Link
-                to="/assignment-details"
+                to="/student/assignment-details"
                 className={styles.button}
               >
                 View Details
               </Link>
+
             </div>
           ))}
 
+        </div>
+
+        <div className={styles.actions}>
+          <Link
+            to="/student/certificates"
+            className={styles.nextBtn}
+          >
+            Continue to Certificates →
+          </Link>
         </div>
 
       </div>

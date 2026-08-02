@@ -9,7 +9,7 @@ function EditNotification() {
         <div className={styles.header}>
           <h1>Edit Notification</h1>
 
-          <Link to="/notifications">
+          <Link to="/admin/notifications">
             Back
           </Link>
         </div>
