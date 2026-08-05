@@ -287,7 +287,11 @@ function ScheduleClass() {
                   Attendees Mapped: <strong>{cls.attendees?.length || 0}</strong>
                 </p>
                 <p style={{ margin: "5px 0 0 0", color: "#64748b", fontSize: "12px" }}>
-                  Scheduled For: {new Date(cls.class_date + "T" + cls.start_time).toLocaleString()}
+                  Scheduled For: {new Date(cls.class_date + "T" + cls.start_time).toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                    hour12: true
+                  })}
                 </p>
               </div>
 

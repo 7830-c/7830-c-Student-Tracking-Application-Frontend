@@ -133,11 +133,15 @@ export function AuthProvider({ children }) {
       "mentor": { role: "MENTOR", first_name: "Demo", last_name: "Mentor", password: "mentor123" },
       "student@sureproed.com": { role: "STUDENT", first_name: "Demo", last_name: "Student" },
       "student": { role: "STUDENT", first_name: "Demo", last_name: "Student", password: "student123" },
+      "trustee-vol@sureproed.com": { role: "TRUSTEE", trusteeType: "VOLUNTEER", first_name: "Volunteer", last_name: "Trustee" },
+      "trustee-vol": { role: "TRUSTEE", trusteeType: "VOLUNTEER", first_name: "Volunteer", last_name: "Trustee", password: "trustee123" },
+      "trustee-com@sureproed.com": { role: "TRUSTEE", trusteeType: "COMMERCIAL", first_name: "Commercial", last_name: "Trustee" },
+      "trustee-com": { role: "TRUSTEE", trusteeType: "COMMERCIAL", first_name: "Commercial", last_name: "Trustee", password: "trustee123" },
     };
 
     const demo = demoAccounts[cleanId];
     if (demo) {
-      const requiredPw = demo.password || (cleanId.includes("admin") ? "admin123" : cleanId.includes("mentor") ? "mentor123" : "student123");
+      const requiredPw = demo.password || (cleanId.includes("admin") ? "admin123" : cleanId.includes("mentor") ? "mentor123" : cleanId.includes("trustee") ? "trustee123" : "student123");
       if (password !== requiredPw) {
         setLoading(false);
         throw new Error("Invalid credentials (demo mode)");
@@ -149,6 +153,7 @@ export function AuthProvider({ children }) {
         firstName: demo.first_name,
         lastName: demo.last_name,
         role: demo.role,
+        trusteeType: demo.trusteeType,
       };
       setUser(demoUser);
       setUserInfo(demoUser);

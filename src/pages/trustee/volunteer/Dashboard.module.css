@@ -1,0 +1,234 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.statCardAlerts, .statCardSchedule, .statCardAttendance, .statCardUsers {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  border-top: 4px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.statCardAlerts { border-top-color: #ef4444; }
+.statCardSchedule { border-top-color: #14b8a6; }
+.statCardAttendance { border-top-color: #3b82f6; }
+.statCardUsers { border-top-color: #f43f5e; }
+
+.statCardAlerts:hover, .statCardSchedule:hover, .statCardAttendance:hover, .statCardUsers:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.iconAlerts, .iconSchedule, .iconAttendance, .iconUsers {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.iconAlerts { background: #fee2e2; color: #ef4444; }
+.iconSchedule { background: #ccfbf1; color: #0d9488; }
+.iconAttendance { background: #dbeafe; color: #2563eb; }
+.iconUsers { background: #ffe4e6; color: #e11d48; }
+
+.statCardAlerts h3, .statCardSchedule h3, .statCardAttendance h3, .statCardUsers h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.statCardAlerts p, .statCardSchedule p, .statCardAttendance p, .statCardUsers p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.radarTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.radarPingWrapper {
+  position: relative;
+  display: flex;
+  height: 16px;
+  width: 16px;
+}
+
+.radarPing {
+  position: absolute;
+  display: inline-flex;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  background-color: #ef4444;
+  opacity: 0.75;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.radarDot {
+  position: relative;
+  display: inline-flex;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+  background-color: #dc2626;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.radarCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.emptyState {
+  padding: 4rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  color: #cbd5e1;
+}
+
+.emptyState h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.className {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.classDetails {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.groupBadge {
+  font-weight: 700;
+  color: #0d9488;
+}
+
+.actionColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.btnOutlineBlue, .btnOutlineTeal, .btnOutlineRed {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: transparent;
+}
+
+.btnOutlineBlue {
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+.btnOutlineBlue:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.btnOutlineTeal {
+  color: #0d9488;
+  border: 1px solid #0d9488;
+}
+.btnOutlineTeal:hover {
+  background: #0d9488;
+  color: white;
+}
+
+.btnOutlineRed {
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+.btnOutlineRed:hover {
+  background: #dc2626;
+  color: white;
+}
+
+.lateInputContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.lateInputContainer input {
+  width: 200px;
+}

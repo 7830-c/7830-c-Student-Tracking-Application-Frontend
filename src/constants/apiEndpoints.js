@@ -81,4 +81,29 @@ export const API_ENDPOINTS = {
     BASE: "/api/companies/",
     BY_ID: (id) => `/api/companies/${id}/`,
   },
+
+  // Trustee
+  TRUSTEE: {
+    // Volunteer operations
+    TODAY_SESSIONS: "/api/sessions/today/",
+    RECENT_SESSIONS: "/api/sessions/recent/",
+    JOIN_SESSION: (id) => `/api/sessions/${id}/join/`,
+    END_SESSION: (id) => `/api/sessions/${id}/end/`,
+    CREATE_SESSION: "/api/sessions/",
+    WHITELIST_GUEST: (id) => `/api/sessions/${id}/whitelist/`,
+    LOW_ATTENDANCE_ALERTS: "/api/attendance/alerts/low/",
+    ATTENDANCE_HIERARCHY: "/api/attendance/hierarchy/",
+    DOWNLOAD_CSV: (id) => `/api/attendance/${id}/csv/`,
+    STREAMS: "/api/streams/",
+    STUDENTS: "/api/students/",
+    REMOVE_STUDENT: (id) => `/api/students/${id}/`,
+
+    // Commercial operations
+    ANNOUNCEMENTS: "/api/trustee/announcements/",
+    ANNOUNCEMENT_BY_ID: (id) => `/api/trustee/announcements/${id}/`,
+    ACHIEVEMENTS: "/api/trustee/achievements/",
+    ACHIEVEMENT_BY_ID: (id) => `/api/trustee/achievements/${id}/`,
+    UPDATES: "/api/trustee/updates/",
+    UPDATE_BY_ID: (id) => `/api/trustee/updates/${id}/`,
+  },
 };

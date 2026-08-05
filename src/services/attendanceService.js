@@ -54,8 +54,22 @@ export const attendanceService = {
     return response.data;
   },
 
-  async resolveWarning(warningId) {
-    const response = await apiClient.post(`${API_ENDPOINTS.ATTENDANCE.BASE}resolve_warning/`, { warning_id: warningId });
+  async resolveWarning(warningId, apologyText = null) {
+    const payload = { warning_id: warningId };
+    if (apologyText) {
+      payload.apology_text = apologyText;
+    }
+    const response = await apiClient.post(`${API_ENDPOINTS.ATTENDANCE.BASE}resolve_warning/`, payload);
+    return response.data;
+  },
+
+  async getAdminQueries() {
+    const response = await apiClient.get(`${API_ENDPOINTS.ATTENDANCE.BASE}admin_queries/`);
+    return response.data;
+  },
+
+  async updateQueryStatus(warningId, action) {
+    const response = await apiClient.post(`${API_ENDPOINTS.ATTENDANCE.BASE}admin_update_query/`, { warning_id: warningId, action });
     return response.data;
   }
 };

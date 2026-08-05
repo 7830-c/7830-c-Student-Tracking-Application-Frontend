@@ -38,7 +38,7 @@ function Dashboard() {
         // 3. Fetch Absence Warnings
         const warningsRes = await attendanceService.getWarnings();
         if (Array.isArray(warningsRes)) {
-            setWarnings(warningsRes);
+          setWarnings(warningsRes);
         }
       } catch (err) {
         console.error("Error loading dashboard data:", err);
@@ -52,9 +52,9 @@ function Dashboard() {
   const handleJoinClass = async (cls) => {
     setIsJoining(true);
     try {
-        await attendanceService.markJoined(cls.id);
+      await attendanceService.markJoined(cls.id);
     } catch (err) {
-        console.error("Failed to mark joined", err);
+      console.error("Failed to mark joined", err);
     }
     setTimeout(() => {
       setIsJoining(false);
@@ -62,13 +62,24 @@ function Dashboard() {
     }, 1000);
   };
 
+  const [apologies, setApologies] = useState({});
+
   const handleResolveWarning = async (warningId) => {
     try {
-        await attendanceService.resolveWarning(warningId);
-        setWarnings(prev => prev.filter(w => w.id !== warningId));
-    } catch(err) {
-        alert("Failed to resolve warning.");
+      const apologyText = apologies[warningId];
+      if (!apologyText || apologyText.trim() === '') {
+        alert("Please write your apology or reason first.");
+        return;
+      }
+      await attendanceService.resolveWarning(warningId, apologyText);
+      setWarnings(prev => prev.map(w => w.id === warningId ? { ...w, status: 'APOLOGIZED' } : w));
+    } catch (err) {
+      alert("Failed to submit apology.");
     }
+  };
+
+  const handleApologyChange = (warningId, text) => {
+    setApologies(prev => ({ ...prev, [warningId]: text }));
   };
 
   const handleDownload = (fileName) => {
@@ -131,113 +142,109 @@ function Dashboard() {
         </div>
       </header>
 
-      <div className={styles.grid}>
-        <div className={styles.leftColumn}>
-          <div className={styles.streamCard}>
-            <div className={styles.streamBlur}></div>
-            <p className={styles.streamLabel}>Your Selected Stream</p>
-            <h2>{profile?.domain || "No Domain Assigned"}</h2>
-            <div className={styles.streamNote}>
-              <p>Your domain-specific resources and technical meeting links will appear here.</p>
-            </div>
-          </div>
+      <div className={styles.immersiveHero}>
+        <div className={styles.heroGlow}></div>
 
-          <div className={styles.resourcesCard}>
-            <h3><span>📚</span> Domain Resources</h3>
-            {availableResources.length === 0 ? (
-              <div className={styles.emptyResources}>
-                <p className={styles.emptyIcon}>📁</p>
-                <p>Your trainer hasn't uploaded any materials yet.</p>
-              </div>
-            ) : (
-              <div className={styles.resourceList}>
-                {availableResources.map((file, idx) => (
-                  <div key={idx} className={styles.resourceItem}>
-                    <div className={styles.resourceInfo}>
-                      <span>📄</span>
-                      <div>
-                        <p className={styles.resourceName}>{file.name}</p>
-                        <p className={styles.resourceDate}>Uploaded today</p>
-                      </div>
-                    </div>
-                    <button onClick={() => handleDownload(file.name)} className={styles.downloadBtn}>Download</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className={styles.heroContent}>
+          <p className={styles.streamLabel}>Your Active Stream</p>
+          <h2 className={styles.streamTitle}>{profile?.domain || "No Domain Assigned"}</h2>
+          <p className={styles.streamSubtitle}>Mastering concepts from silicon to systems. Access your live sessions and materials below.</p>
         </div>
 
-        <div className={styles.rightColumn}>
-          <h3>Live Training & Classes</h3>
+        <div className={styles.floatingLiveSection}>
+          <h3 className={styles.sectionTitle}>Live Session</h3>
 
           {todayClasses.length === 0 ? (
-            <div className={styles.noClassCard}>
-              <p>Sunday Sessions (8 weeks). <br /> Batch Assignment: <strong>{profile?.course_batch || 'Pending Admin Assignment'}</strong></p>
-              <span className={styles.noClassTag}>No Class Today</span>
+            <div className={styles.cleanStatus}>
+              <span className={styles.pulseDot}></span> No active sessions scheduled right now.
             </div>
           ) : (
             todayClasses.map((cls, idx) => {
               const classStart = new Date(cls.class_date + "T" + cls.start_time);
-              const nowDiff = (new Date() - classStart) / 1000 / 60; // difference in minutes
+              const nowDiff = (new Date() - classStart) / 1000 / 60;
               const classOpen = cls.conducted !== false && nowDiff >= -10 && nowDiff <= 5;
-              const hasEnded = cls.conducted === false || nowDiff > 5;
+              const hasEnded = cls.conducted === false || cls.status === 'ENDED' || nowDiff > 5;
+
+              if (hasEnded) {
+                const endTime = cls.updated_at ? new Date(cls.updated_at) : new Date(classStart.getTime() + (60 * 60 * 1000));
+                if ((new Date() - endTime) / 1000 / 60 > 30) return null;
+              }
 
               return (
-              <div key={idx} className={styles.classCard}>
-                <div>
-                  <div className={styles.classHeader}>
-                    <div>
+                <div key={idx} className={styles.classCardWrapper}>
+                  <div className={styles.glassRow}>
+                    <div className={styles.glassInfo}>
                       <h4>{cls.session_type || "Domain Session"}</h4>
-                      <p className={styles.classStream}>{cls.title || profile?.domain}</p>
+                      <p>{classStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
-                    {hasEnded ? (
-                      <span style={{ backgroundColor: "#fee2e2", color: "#991b1b", padding: "4px 8px", borderRadius: "12px", fontSize: "12px", fontWeight: "bold" }}>Ended</span>
+
+                    {classOpen ? (
+                      <button onClick={() => handleJoinClass(cls)} disabled={isJoining || !cls.meeting_link} className={styles.btnExtreme}>
+                        {!isJoining ? 'Join Live' : 'Connecting...'}
+                      </button>
+                    ) : hasEnded ? (
+                      <span className={styles.statusEnded}>Ended</span>
                     ) : (
-                      <span className={styles.liveTag}>Live Today!</span>
+                      <span className={styles.statusWaiting}>Opens in 10m</span>
                     )}
                   </div>
-                  <div className={styles.classTimes}>
-                    <p className={styles.timeMain}>{classStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+
+                  {/* New Instructions Block */}
+                  <div className={styles.classInstructions}>
+                    <p>📸 <strong>Requirement:</strong> Camera must be ON to track attendance.</p>
+                    <p>⏱️ <strong>Note:</strong> Attendance is calculated based on your active time in the meeting.</p>
                   </div>
                 </div>
-
-                {classOpen ? (
-                  <button
-                    onClick={() => handleJoinClass(cls)}
-                    disabled={isJoining || !cls.meeting_link}
-                    className={cls.meeting_link ? styles.joinBtnActive : styles.joinBtnDisabled}
-                  >
-                    {!isJoining && (cls.meeting_link ? '🚀 Enter Secure Class' : '🔒 Generating Link...')}
-                    {isJoining && <div className={styles.btnSpinner}></div>}
-                  </button>
-                ) : hasEnded ? (
-                  <button disabled className={styles.joinBtnDisabled} style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", backgroundColor: "#e5e7eb", color: "#9ca3af", fontWeight: "bold", cursor: "not-allowed", marginTop: "1rem" }}>
-                    🔒 Class Locked
-                  </button>
-                ) : (
-                  <button disabled className={styles.joinBtnDisabled} style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none", backgroundColor: "#e5e7eb", color: "#9ca3af", fontWeight: "bold", cursor: "not-allowed", marginTop: "1rem" }}>
-                    ⏳ Opens 10 mins before
-                  </button>
-                )}
-                <p className={styles.cameraNote}>Camera must be ON to track attendance.</p>
-              </div>
-            )})
+              )
+            })
           )}
         </div>
       </div>
-      
+
+      <div className={styles.minimalResources}>
+        <h3 className={styles.sectionTitleDark}>Domain Resources</h3>
+        {availableResources.length === 0 ? (
+          <p className={styles.cleanText}>Your trainer hasn't uploaded materials yet.</p>
+        ) : (
+          <div className={styles.resourceListClean}>
+            {availableResources.map((file, idx) => (
+              <div key={idx} className={styles.cleanResourceRow}>
+                <span className={styles.fileIcon}>📄</span>
+                <span className={styles.fileName}>{file.name}</span>
+                <button onClick={() => handleDownload(file.name)} className={styles.cleanDownloadBtn}>Download</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {warnings.length > 0 && (
         <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 1000, display: "flex", flexDirection: "column", gap: "10px" }}>
-            {warnings.map(w => (
-                <div key={w.id} style={{ background: "#fee2e2", border: "1px solid #ef4444", padding: "16px", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", maxWidth: "350px" }}>
-                    <h4 style={{ color: "#991b1b", margin: "0 0 8px 0" }}>⚠️ Absence Warning</h4>
-                    <p style={{ color: "#7f1d1d", fontSize: "14px", margin: "0 0 12px 0" }}>
-                        You missed the class: <strong>{w.session_title}</strong> on {w.class_date}. Kindly ask permission and resolve this otherwise you will be removed.
-                    </p>
-                    <button onClick={() => handleResolveWarning(w.id)} style={{ background: "#dc2626", color: "white", padding: "8px 16px", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Acknowledge & Resolve</button>
+          {warnings.filter(w => w.status !== 'ACCEPTED').map(w => (
+            <div key={w.id} style={{ background: "#fee2e2", border: "1px solid #ef4444", padding: "16px", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", maxWidth: "350px" }}>
+              <h4 style={{ color: "#991b1b", margin: "0 0 8px 0" }}>⚠️ Absence Warning</h4>
+              <p style={{ color: "#7f1d1d", fontSize: "14px", margin: "0 0 12px 0" }}>
+                You attended less than 40% of the class: <strong>{w.session_title}</strong> on {w.class_date}. Kindly ask permission and resolve this otherwise you will be removed.
+              </p>
+              
+              {w.status === 'PENDING' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <textarea
+                    placeholder="Write your apology or reason here..."
+                    value={apologies[w.id] || ''}
+                    onChange={(e) => handleApologyChange(w.id, e.target.value)}
+                    rows={3}
+                    style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #fca5a5", fontSize: "14px", resize: 'none' }}
+                  />
+                  <button onClick={() => handleResolveWarning(w.id)} style={{ background: "#dc2626", color: "white", padding: "8px 16px", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Submit Apology</button>
                 </div>
-            ))}
+              ) : (
+                <div style={{ padding: "8px", background: "#fef2f2", color: "#b91c1c", borderRadius: "6px", fontSize: "14px", fontWeight: "bold", textAlign: "center" }}>
+                  Apology submitted. Waiting for admin approval.
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -107,6 +107,28 @@
   background: var(--primary-light);
 }
 
+.outlineBtn {
+  background: transparent;
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.outlineBtn:hover {
+  background: #eff6ff;
+}
+
+.trusteePrimaryBtn {
+  background: #0d9488;
+  color: white;
+  border: none;
+}
+
+.trusteePrimaryBtn:hover {
+  background: #0f766e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.2), 0 2px 4px -1px rgba(13, 148, 136, 0.1);
+}
+
 .right {
   flex: 1;
   display: flex;

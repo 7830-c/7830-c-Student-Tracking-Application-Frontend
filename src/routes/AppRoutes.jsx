@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
 /* Layouts */
@@ -6,6 +6,7 @@ import PublicLayout from "../layouts/PublicLayout";
 import StudentLayout from "../layouts/StudentLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import MentorLayout from "../layouts/MentorLayout";
+import TrusteeLayout from "../layouts/TrusteeLayout";
 
 /* Auth & Public */
 import Landing from "../pages/landing/Landing";
@@ -16,7 +17,21 @@ import ResetPassword from "../pages/auth/ResetPassword";
 import EmailVerification from "../pages/auth/EmailVerification";
 import AdminLogin from "../pages/admin/AdminLogin";
 import MentorLogin from "../pages/mentor/MentorLogin";
+import TrusteeLogin from "../pages/trustee/TrusteeLogin";
 import NotFound from "../pages/NotFound";
+
+/* Volunteer Trustee */
+import VolunteerDashboard from "../pages/trustee/volunteer/Dashboard";
+import VolunteerAlerts from "../pages/trustee/volunteer/Alerts";
+import VolunteerSchedule from "../pages/trustee/volunteer/Schedule";
+import VolunteerAttendance from "../pages/trustee/volunteer/Attendance";
+import VolunteerUsers from "../pages/trustee/volunteer/Users";
+
+/* Commercial Trustee */
+import CommercialDashboard from "../pages/trustee/commercial/Dashboard";
+import Announcements from "../pages/trustee/commercial/Announcements";
+import Achievements from "../pages/trustee/commercial/Achievements";
+import Updates from "../pages/trustee/commercial/Updates";
 
 /* Student */
 import StudentDashboard from "../pages/student/Dashboard";
@@ -92,6 +107,7 @@ import Reports from "../pages/admin/Reports";
 import StudentReport from "../pages/admin/StudentReport";
 import CourseReport from "../pages/admin/CourseReport";
 import ExamReport from "../pages/admin/ExamReport";
+import StudentQueries from "../pages/admin/StudentQueries";
 
 /* Cohort Management */
 import Cohorts from "../pages/admin/Cohorts";
@@ -163,6 +179,7 @@ function AppRoutes() {
           <Route path="/email-verification" element={<EmailVerification />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/mentor/login" element={<MentorLogin />} />
+          <Route path="/trustee/login" element={<TrusteeLogin />} />
         </Route>
 
         {/* ================= STUDENT MODULE (PROTECTED) ================= */}
@@ -292,6 +309,7 @@ function AppRoutes() {
             <Route path="student-report" element={<StudentReport />} />
             <Route path="course-report" element={<CourseReport />} />
             <Route path="exam-report" element={<ExamReport />} />
+            <Route path="student-queries" element={<StudentQueries />} />
 
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
@@ -319,6 +337,27 @@ function AppRoutes() {
             <Route path="assignment-feedback" element={<MentorAssignmentFeedback />} />
             <Route path="profile" element={<MentorProfile />} />
             <Route path="settings" element={<MentorSettings />} />
+          </Route>
+        </Route>
+
+        {/* ================= TRUSTEE MODULE (PROTECTED) ================= */}
+        <Route element={<ProtectedRoute allowedRoles={["TRUSTEE"]} redirectTo="/trustee/login" />}>
+          <Route path="/trustee" element={<TrusteeLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Navigate to="volunteer/dashboard" replace />} />
+            
+            {/* Volunteer Trustee */}
+            <Route path="volunteer/dashboard" element={<VolunteerDashboard />} />
+            <Route path="volunteer/alerts" element={<VolunteerAlerts />} />
+            <Route path="volunteer/schedule" element={<VolunteerSchedule />} />
+            <Route path="volunteer/attendance" element={<VolunteerAttendance />} />
+            <Route path="volunteer/users" element={<VolunteerUsers />} />
+            
+            {/* Commercial Trustee */}
+            <Route path="commercial/dashboard" element={<CommercialDashboard />} />
+            <Route path="commercial/announcements" element={<Announcements />} />
+            <Route path="commercial/achievements" element={<Achievements />} />
+            <Route path="commercial/updates" element={<Updates />} />
           </Route>
         </Route>
 

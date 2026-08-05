@@ -19,8 +19,12 @@ function AttendanceHistoryAdmin() {
         ]);
 
         if (isMounted) {
-          setHistory(Array.isArray(attendanceResponse.data) ? attendanceResponse.data : []);
-          setCohorts(Array.isArray(cohortsResponse.data) ? cohortsResponse.data : []);
+          // 🚨 FIX: Safely extract Django's paginated 'results' array
+          const histData = attendanceResponse.data || {};
+          const cohData = cohortsResponse.data || {};
+
+          setHistory(Array.isArray(histData.results) ? histData.results : (Array.isArray(histData) ? histData : []));
+          setCohorts(Array.isArray(cohData.results) ? cohData.results : (Array.isArray(cohData) ? cohData : []));
         }
       } catch (err) {
         console.error("Failed to load attendance history:", err);

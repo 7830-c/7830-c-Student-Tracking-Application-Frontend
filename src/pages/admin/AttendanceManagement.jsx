@@ -7,27 +7,33 @@ import styles from "./AttendanceManagement.module.css";
 function AttendanceManagement() {
   const [attendance, setAttendance] = useState([]);
   const [cohorts, setCohorts] = useState([]);
+  const [courses, setCourses] = useState([]); // 🚨 1. Add courses state
   const [loading, setLoading] = useState(true);
+
+  const [selectedCourse, setSelectedCourse] = useState(""); // 🚨 2. Change filterDomain to selectedCourse
+  const [filterGroup, setFilterGroup] = useState("");
 
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
       try {
-        const [attendanceResponse, cohortsResponse] = await Promise.all([
+        const [attendanceResponse, cohortsResponse, coursesResponse] = await Promise.all([
           apiClient.get(API_ENDPOINTS.ATTENDANCE.BASE),
           apiClient.get(API_ENDPOINTS.COHORTS.BASE),
+          apiClient.get(API_ENDPOINTS.COURSES?.BASE || "/api/courses/"), // 🚨 Fetch available courses
         ]);
 
         if (isMounted) {
-          setAttendance(Array.isArray(attendanceResponse.data) ? attendanceResponse.data : []);
-          setCohorts(Array.isArray(cohortsResponse.data) ? cohortsResponse.data : []);
+          const attData = attendanceResponse.data || {};
+          const cohData = cohortsResponse.data || {};
+          const courseData = coursesResponse.data || {};
+
+          setAttendance(Array.isArray(attData.results) ? attData.results : (Array.isArray(attData) ? attData : []));
+          setCohorts(Array.isArray(cohData.results) ? cohData.results : (Array.isArray(cohData) ? cohData : []));
+          setCourses(Array.isArray(courseData.results) ? courseData.results : (Array.isArray(courseData) ? courseData : []));
         }
       } catch (err) {
         console.error("Failed to load attendance data:", err);
-        if (isMounted) {
-          setAttendance([]);
-          setCohorts([]);
-        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -39,18 +45,91 @@ function AttendanceManagement() {
     };
   }, []);
 
-  const getCohortName = (cohortId) => {
-    const cohort = cohorts.find((item) => item.id === cohortId);
-    return cohort?.name || cohort?.code || "Unknown";
+  // 🚨 Fixed String Parsing Logic
+  const getCohortName = (cohortId, title) => {
+    const cohort = cohorts.find((item) => String(item.id) === String(cohortId));
+    if (cohort && cohort.course?.name) return cohort.course.name;
+    if (cohort && cohort.name) return cohort.name;
+    if (title) {
+      const parts = title.split(" - ");
+      if (parts.length > 2) {
+        return parts.slice(0, parts.length - 1).join(" - ").trim();
+      }
+      return parts[0].trim();
+    }
+    return "General Session";
   };
 
-  const formatDate = (value) => {
-    if (!value) return "N/A";
-    return new Date(value).toLocaleDateString("en-IN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const getCohortBatch = (cohortId, title) => {
+    const cohort = cohorts.find((item) => String(item.id) === String(cohortId));
+    if (cohort && cohort.batch_name) return cohort.batch_name;
+    if (title) {
+      const parts = title.split(" - ");
+      return parts.length > 1 ? parts[parts.length - 1].trim() : "N/A";
+    }
+    return "N/A";
+  };
+
+  const getDomainName = (cohortId, title) => {
+    const cohort = cohorts.find((item) => String(item.id) === String(cohortId));
+    if (cohort && cohort.course?.name) return cohort.course.name;
+    if (title) {
+      // If it contains a hyphen, the group is usually the last segment (e.g., G2-26)
+      const parts = title.split(" - ");
+      if (parts.length > 2) {
+        return parts.slice(0, parts.length - 1).join(" - ").trim(); // Everything except the last part
+      }
+      return parts[0].trim();
+    }
+    return "General Session";
+  };
+
+  const getGroupNumber = (cohortId, title) => {
+    const cohort = cohorts.find((item) => String(item.id) === String(cohortId));
+    if (cohort && cohort.batch_name) return cohort.batch_name;
+    if (title) {
+      const parts = title.split(" - ");
+      // Grab the last part as the group number if it matches pattern or is the tail
+      return parts.length > 1 ? parts[parts.length - 1].trim() : "N/A";
+    }
+    return "N/A";
+  };
+
+  // 🚨 Filter Logic
+  const filteredAttendance = attendance.filter((item) => {
+    const domainName = getDomainName(item.cohort, item.title);
+    const groupName = getGroupNumber(item.cohort, item.title);
+
+    const matchesCourse = selectedCourse === "" || domainName.toLowerCase().includes(selectedCourse.toLowerCase());
+    const matchesGroup = filterGroup === "" || groupName.toLowerCase().includes(filterGroup.toLowerCase());
+
+    return matchesCourse && matchesGroup;
+  });
+
+  const handleDownloadExcel = async (itemId, itemTitle, itemDate) => {
+    try {
+      const response = await apiClient.get(`/api/attendance/${itemId}/download_excel/`, {
+        responseType: 'blob',
+      });
+
+      // 🚨 Force Excel MIME type
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+
+      const safeTitle = (itemTitle || "Attendance").replace(/[\s/]/g, "_");
+      // 🚨 Force .xlsx extension
+      link.download = `${safeTitle}_${itemDate}.xlsx`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Failed to download excel report:", err);
+      alert("Failed to download the report. Make sure the session has ended.");
+    }
   };
 
   return (
@@ -60,63 +139,130 @@ function AttendanceManagement() {
           <h1>Attendance Management</h1>
           <p>Manage daily attendance records</p>
         </div>
-
         <Link to="/admin/update-attendance" className={styles.addBtn}>
           + Update Attendance
         </Link>
       </div>
 
+      {/* 🚨 Course Dropdown & Group Input UI */}
+      <div style={{ display: "flex", gap: "16px", marginBottom: "24px", backgroundColor: "white", padding: "16px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+
+        {/* Course Dropdown */}
+        <select
+          value={selectedCourse}
+          onChange={(e) => setSelectedCourse(e.target.value)}
+          style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db", backgroundColor: "white" }}
+        >
+          <option value="">-- Select Course / Stream --</option>
+          {courses.map((c) => (
+            <option key={c.id} value={c.name || c.title}>
+              {c.name || c.title}
+            </option>
+          ))}
+        </select>
+
+        {/* Group Number Input */}
+        <input
+          type="text"
+          placeholder="Filter by Group Number (e.g. G2-26)"
+          value={filterGroup}
+          onChange={(e) => setFilterGroup(e.target.value)}
+          style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+        />
+
+        <button
+          onClick={() => { setSelectedCourse(""); setFilterGroup(""); }}
+          style={{ padding: "10px 16px", backgroundColor: "#f3f4f6", border: "1px solid #d1d5db", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}
+        >
+          Clear
+        </button>
+      </div>
+
       {loading ? (
         <p>Loading attendance records from the database...</p>
-      ) : attendance.length === 0 ? (
-        <p>No attendance sessions have been recorded yet.</p>
+      ) : filteredAttendance.length === 0 ? (
+        <p>No attendance sessions match your filters.</p>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Session</th>
-                <th>Cohort</th>
                 <th>Date</th>
-                <th>Timings</th>
-                <th>Expected</th>
+                <th>Domain Name</th>
+                <th>Group Number</th>
+                <th>Total Students</th>
+                <th>Whitelisted</th>
                 <th>Joined</th>
-                <th>Status</th>
+                <th>Absent</th>
                 <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
-              {attendance.map((item) => {
+              {filteredAttendance.map((item) => {
                 const getDownloadLink = (item) => {
-                  const safeTitle = (item.title || "Attendance Session").replace(/ /g, "_").replace(/\//g, "-");
-                  const fileName = `${safeTitle}_${item.class_date}.csv`;
-                  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-                  const serverUrl = baseUrl.replace(/\/api\/?$/, "");
-                  return `${serverUrl}/media/attendance_reports/${fileName}`;
+                  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/";
+                  return `${baseUrl}attendance/${item.id}/download_excel/`;
                 };
 
                 return (
-                <tr key={item.id}>
-                  <td>{item.title || "Attendance Session"}</td>
-                  <td>{getCohortName(item.cohort)}</td>
-                  <td>{formatDate(item.class_date)}</td>
-                  <td>{item.start_time?.slice(0,5)} - {item.end_time ? item.end_time.slice(0,5) : "TBD"}</td>
-                  <td>{Array.isArray(item.attendees) ? item.attendees.length : 0}</td>
-                  <td>{Array.isArray(item.joined_students) ? item.joined_students.length : 0}</td>
+                  <tr key={item.id}>
+                    <td>{item.class_date}</td>
+                    <td>{getCohortName(item.cohort, item.title)}</td>
+                    <td>{getCohortBatch(item.cohort, item.title)}</td>
+                    <td>{Array.isArray(item.attendees) ? item.attendees.length : 0}</td>
+                    <td>{item.guest_emails ? item.guest_emails.length : (item.notes && item.notes.includes('Whitelisted Guests:') ? item.notes.split(',').length - 1 : 0)}</td>
+                    <td>{Array.isArray(item.joined_students) ? item.joined_students.length : 0}</td>
+                    <td>{Math.max(0, (Array.isArray(item.attendees) ? item.attendees.length : 0) - (Array.isArray(item.joined_students) ? item.joined_students.length : 0))}</td>
 
-                  <td className={item.conducted === false ? styles.absent : styles.present}>
-                    {item.conducted === false ? "Ended" : "Active"}
-                  </td>
-
-                  <td className={styles.actions} style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    {item.conducted === false && (
-                       <a href={getDownloadLink(item)} target="_blank" rel="noreferrer" style={{background: "#16a34a", color: "white", padding: "6px 12px", borderRadius: "6px", textDecoration: "none", fontWeight: "bold", fontSize: "12px", display: "inline-block", textAlign: "center"}}>⬇️ CSV</a>
-                    )}
-                    <Link to="/admin/attendance-details">View</Link>
-                  </td>
-                </tr>
-              )})}
+                    <td className={styles.actions} style={{ whiteSpace: "nowrap", verticalAlign: "middle" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", margin: 0, padding: 0 }}>
+                        {item.conducted === false && (
+                          <button
+                            onClick={() => handleDownloadExcel(item.id, item.title, item.class_date)}
+                            style={{
+                              background: "#16a34a",
+                              color: "white",
+                              padding: "7px 14px",
+                              borderRadius: "6px",
+                              border: "none",
+                              cursor: "pointer",
+                              fontWeight: "bold",
+                              fontSize: "12px",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              margin: 0
+                            }}
+                          >
+                            ⬇️ Excel
+                          </button>
+                        )}
+                        <Link
+                          to="/admin/attendance-details"
+                          state={{ sessionId: item.id, sessionTitle: item.title, sessionDate: item.class_date }}
+                          style={{
+                            background: "#3b82f6",
+                            color: "white",
+                            padding: "7px 16px",
+                            borderRadius: "6px",
+                            textDecoration: "none",
+                            fontWeight: "bold",
+                            fontSize: "12px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            margin: 0
+                          }}
+                        >
+                          View
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

@@ -83,6 +83,25 @@ function Hero() {
             </div>
           </div>
 
+          {/* Trustee */}
+
+          <div className={styles.portalCard} style={{ borderLeftColor: '#0d9488' }}>
+            <h2 style={{ color: '#0f766e' }}>🛡️ Trustee Portal</h2>
+
+            <p>
+              Board trustees, volunteer coordinators, and commercial partners — manage operations and announcements.
+            </p>
+
+            <div className={styles.portalButtons}>
+              <Link
+                to="/trustee/login"
+                className={styles.trusteePrimaryBtn}
+              >
+                Trustee Login
+              </Link>
+            </div>
+          </div>
+
         </div>
       </div>
 

@@ -23,6 +23,8 @@ function ProtectedRoute({ allowedRoles, redirectTo = "/login" }) {
         ? "/admin/dashboard"
         : user.role === "MENTOR"
         ? "/mentor/dashboard"
+        : user.role === "TRUSTEE"
+        ? "/trustee/dashboard"
         : "/student/profile";
     return <Navigate to={roleHome} replace />;
   }
