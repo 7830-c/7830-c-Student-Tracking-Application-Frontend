@@ -19,6 +19,7 @@ import MentorLogin from "../pages/mentor/MentorLogin";
 import NotFound from "../pages/NotFound";
 
 /* Student */
+import StudentDashboard from "../pages/student/Dashboard";
 import Profile from "../pages/student/Profile";
 import ApplyCourse from "../pages/student/ApplyCourse";
 import CourseDetails from "../pages/student/CourseDetails";
@@ -98,6 +99,9 @@ import CohortDetails from "../pages/admin/CohortDetails";
 import AddCohort from "../pages/admin/AddCohort";
 import EditCohort from "../pages/admin/EditCohort";
 
+/* Session Scheduling */
+import ScheduleClass from "../pages/admin/ScheduleClass";
+
 /* Attendance Management */
 import AttendanceManagement from "../pages/admin/AttendanceManagement";
 import AttendanceDetails from "../pages/admin/AttendanceDetails";
@@ -164,8 +168,8 @@ function AppRoutes() {
         {/* ================= STUDENT MODULE (PROTECTED) ================= */}
         <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} redirectTo="/login" />}>
           <Route path="/student" element={<StudentLayout />}>
-            <Route index element={<Navigate to="profile" replace />} />
-            <Route path="dashboard" element={<Profile />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="profile" element={<Profile />} />
             <Route path="public-profile" element={<Profile />} />
 
@@ -252,6 +256,9 @@ function AppRoutes() {
             <Route path="add-cohort" element={<AddCohort />} />
             <Route path="edit-cohort" element={<EditCohort />} />
             <Route path="edit-cohort/:id" element={<EditCohort />} />
+
+            {/* Session Scheduling */}
+            <Route path="schedule" element={<ScheduleClass />} />
 
             {/* Attendance */}
             <Route path="attendance" element={<AttendanceManagement />} />

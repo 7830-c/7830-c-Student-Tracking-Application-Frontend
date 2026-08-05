@@ -15,6 +15,7 @@ const adminLinks = [
   { label: "Applications", path: "/admin/applications" },
   { label: "Exams", path: "/admin/exams" },
   { label: "Cohorts", path: "/admin/cohorts" },
+  { label: "Schedule Class", path: "/admin/schedule" },
   { label: "Attendance", path: "/admin/attendance" },
   { label: "Assignments", path: "/admin/assignments" },
   { label: "Certificates", path: "/admin/certificates" },

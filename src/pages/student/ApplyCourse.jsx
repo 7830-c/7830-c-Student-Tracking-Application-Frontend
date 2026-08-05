@@ -20,7 +20,7 @@ function ApplyCourse() {
           courseService.getCourses(),
         ]);
         setProfileCompleted(studentService.isProfileComplete(profileData));
-        setCourses(coursesData || []);
+        setCourses(Array.isArray(coursesData) ? coursesData : coursesData?.results || coursesData?.data || []);
       } catch (err) {
         console.error("Failed to load apply-course data:", err);
       } finally {

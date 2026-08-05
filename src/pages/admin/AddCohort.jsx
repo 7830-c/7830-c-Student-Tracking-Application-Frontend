@@ -92,75 +92,80 @@ function AddCohort() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h1>Add New Cohort</h1>
-          <Link to="/admin/cohorts">Back</Link>
+    <div style={{ padding: "2rem", width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+        <div>
+          <h1 style={{ margin: 0, color: "#111827", fontSize: "2rem" }}>Add New Batch / Cohort</h1>
+          <p style={{ color: "#6b7280", margin: "4px 0 0 0" }}>Create a new training group and assign it to a Domain.</p>
         </div>
+        <Link to="/admin/cohorts" style={{ padding: "10px 20px", backgroundColor: "#f3f4f6", color: "#374151", borderRadius: "8px", textDecoration: "none", fontWeight: "bold" }}>← Back to Batches</Link>
+      </div>
 
-        {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
-        {success ? <p style={{ color: "#166534" }}>{success}</p> : null}
+      <div style={{ backgroundColor: "white", padding: "2.5rem", borderRadius: "12px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
+        {error ? <div style={{ color: "#b91c1c", backgroundColor: "#fee2e2", padding: "12px", borderRadius: "8px", marginBottom: "1.5rem", fontWeight: "bold" }}>{error}</div> : null}
+        {success ? <div style={{ color: "#166534", backgroundColor: "#dcfce7", padding: "12px", borderRadius: "8px", marginBottom: "1.5rem", fontWeight: "bold" }}>{success}</div> : null}
 
         {loadingCourses ? (
-          <p>Loading course options...</p>
+          <p style={{ color: "#6b7280", fontWeight: "bold" }}>Loading Domain options...</p>
         ) : (
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.group}>
-              <label>Cohort Code</label>
-              <input type="text" name="code" value={form.code} onChange={handleChange} placeholder="e.g. JAVA-B1" />
+          <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Group / Cohort Code *</label>
+              <input type="text" name="code" value={form.code} onChange={handleChange} placeholder="e.g. G15" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
             </div>
 
-            <div className={styles.group}>
-              <label>Cohort Name</label>
-              <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Enter cohort name" />
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Group / Cohort Name *</label>
+              <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Enter batch name" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
             </div>
 
-            <div className={styles.group}>
-              <label>Course</label>
-              <select name="course" value={form.course} onChange={handleChange}>
-                <option value="">Select a course</option>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Assign Course / Domain *</label>
+              <select name="course" value={form.course} onChange={handleChange} style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", backgroundColor: "white" }}>
+                <option value="">-- Select a Domain --</option>
                 {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name}
-                  </option>
+                  <option key={course.id} value={course.id}>{course.name}</option>
                 ))}
               </select>
             </div>
 
-            <div className={styles.group}>
-              <label>Start Date</label>
-              <input type="date" name="start_date" value={form.start_date} onChange={handleChange} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Maximum Students *</label>
+              <input type="number" name="max_students" value={form.max_students} onChange={handleChange} min="1" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
             </div>
 
-            <div className={styles.group}>
-              <label>End Date</label>
-              <input type="date" name="end_date" value={form.end_date} onChange={handleChange} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Start Date *</label>
+              <input type="date" name="start_date" value={form.start_date} onChange={handleChange} style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
             </div>
 
-            <div className={styles.group}>
-              <label>Maximum Students</label>
-              <input type="number" name="max_students" value={form.max_students} onChange={handleChange} min="1" />
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>End Date *</label>
+              <input type="date" name="end_date" value={form.end_date} onChange={handleChange} style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
             </div>
 
-            <div className={styles.group}>
-              <label>Status</label>
-              <select name="status" value={form.status} onChange={handleChange}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Status</label>
+              <select name="status" value={form.status} onChange={handleChange} style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", backgroundColor: "white" }}>
                 <option value="DRAFT">Draft</option>
-                <option value="OPEN">Open</option>
-                <option value="ACTIVE">Active</option>
+                <option value="OPEN">Open for Applications</option>
+                <option value="ACTIVE">Active (In Progress)</option>
                 <option value="COMPLETED">Completed</option>
               </select>
             </div>
 
-            <div className={styles.group}>
-              <label>Meeting Link</label>
-              <input type="url" name="meeting_link" value={form.meeting_link} onChange={handleChange} placeholder="Optional meeting link" />
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Temporary Meeting Link (Optional)</label>
+              <input type="url" name="meeting_link" value={form.meeting_link} onChange={handleChange} placeholder="https://meet.google.com/..." style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
             </div>
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Cohort"}
-            </button>
+            <div style={{ gridColumn: "1 / -1", display: "flex", gap: "1rem", marginTop: "1rem", borderTop: "1px solid #e5e7eb", paddingTop: "1.5rem" }}>
+              <button type="submit" disabled={loading} style={{ padding: "12px 24px", backgroundColor: "#2563eb", color: "white", borderRadius: "8px", border: "none", fontWeight: "bold", cursor: loading ? "not-allowed" : "pointer" }}>
+                {loading ? "Creating..." : "Create Batch"}
+              </button>
+              <Link to="/admin/cohorts" style={{ padding: "12px 24px", backgroundColor: "#f3f4f6", color: "#374151", borderRadius: "8px", textDecoration: "none", fontWeight: "bold" }}>Cancel</Link>
+            </div>
           </form>
         )}
       </div>

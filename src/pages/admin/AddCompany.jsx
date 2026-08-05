@@ -140,6 +140,9 @@ function AddCompany() {
             </div>
 
             <div className={styles.buttons}>
+              <button type="button" onClick={() => navigate("/admin/companies")} style={{ backgroundColor: "#f3f4f6", color: "#374151", marginRight: "1rem" }}>
+                Cancel
+              </button>
               <button type="submit" disabled={loading}>
                 {loading ? "Saving..." : "Add Company"}
               </button>

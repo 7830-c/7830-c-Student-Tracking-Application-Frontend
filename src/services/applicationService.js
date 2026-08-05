@@ -32,6 +32,13 @@ export const applicationService = {
     return response.data;
   },
 
+  async approveApplication(id) {
+    const response = await apiClient.patch(API_ENDPOINTS.APPLICATIONS.BY_ID(id), {
+      status: "ACCEPTED"
+    });
+    return response.data;
+  },
+
   async assignCohort(id, cohortId) {
     const response = await apiClient.post(
       API_ENDPOINTS.APPLICATIONS.ASSIGN_COHORT(id),

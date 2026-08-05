@@ -1,4 +1,4 @@
-.container {
+/* .container {
   min-height: 100vh;
   background: #f4f7fb;
   display: flex;
@@ -13,6 +13,21 @@
   border-radius: 12px;
   padding: 35px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+} */
+ .container {
+  padding: 30px 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card {
+  width: 100%; /* Takes full width instead of 900px */
+  max-width: 1400px; /* Prevents it from stretching infinitely on huge monitors */
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Softer, more modern shadow */
 }
 
 .header {

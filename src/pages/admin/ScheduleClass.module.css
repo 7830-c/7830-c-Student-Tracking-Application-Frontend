@@ -1,0 +1,25 @@
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Ensure the live session radar/list items stack cleanly in a single vertical column */
+.classList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.classCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    width: 100%;
+}

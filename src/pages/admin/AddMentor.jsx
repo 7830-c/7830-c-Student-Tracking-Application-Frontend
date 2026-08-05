@@ -12,10 +12,19 @@ function AddMentor() {
     email: "",
     phone_number: "",
     password: "",
+    domain: "",
     role: "MENTOR",
     is_active: true,
   });
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Fetch courses for Domain dropdown
+  useState(() => {
+    apiClient.get(API_ENDPOINTS.COURSES.BASE).then(res => {
+      setCourses(res.data?.results || res.data || []);
+    }).catch(err => console.error(err));
+  }, []);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -47,6 +56,7 @@ function AddMentor() {
         email: form.email.trim(),
         phone_number: form.phone_number.trim() || null,
         password: form.password,
+        domain: form.domain.trim() || null,
         role: "MENTOR",
         is_active: form.is_active,
       };
@@ -63,52 +73,64 @@ function AddMentor() {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <h1>Add New Mentor</h1>
-        <p className={styles.subtitle}>Enter mentor information below.</p>
+    <div style={{ padding: "2rem", width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+        <div>
+          <h1 style={{ margin: 0, color: "#111827", fontSize: "2rem" }}>Add New Mentor</h1>
+          <p style={{ color: "#6b7280", margin: "4px 0 0 0" }}>Register a new mentor and assign their specific training domain.</p>
+        </div>
+        <Link to="/admin/mentors" style={{ padding: "10px 20px", backgroundColor: "#f3f4f6", color: "#374151", borderRadius: "8px", textDecoration: "none", fontWeight: "bold" }}>← Back to Mentors</Link>
+      </div>
 
-        {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
-        {success ? <p style={{ color: "#166534" }}>{success}</p> : null}
+      <div style={{ backgroundColor: "white", padding: "2.5rem", borderRadius: "12px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
+        {error ? <div style={{ color: "#b91c1c", backgroundColor: "#fee2e2", padding: "12px", borderRadius: "8px", marginBottom: "1.5rem", fontWeight: "bold" }}>{error}</div> : null}
+        {success ? <div style={{ color: "#166534", backgroundColor: "#dcfce7", padding: "12px", borderRadius: "8px", marginBottom: "1.5rem", fontWeight: "bold" }}>{success}</div> : null}
 
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.group}>
-            <label>First Name</label>
-            <input type="text" name="first_name" value={form.first_name} onChange={handleChange} placeholder="Enter first name" />
+        <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>First Name *</label>
+            <input type="text" name="first_name" value={form.first_name} onChange={handleChange} placeholder="e.g. Jane" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Last Name *</label>
+            <input type="text" name="last_name" value={form.last_name} onChange={handleChange} placeholder="e.g. Smith" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Email Address *</label>
+            <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="mentor@example.com" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Phone Number</label>
+            <input type="tel" name="phone_number" value={form.phone_number} onChange={handleChange} placeholder="+91 9876543210" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Assigned Domain</label>
+            <select name="domain" value={form.domain} onChange={handleChange} style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", backgroundColor: "white" }}>
+              <option value="">-- Select Domain (Optional) --</option>
+              {courses.map(c => <option key={c.id} value={c.name || c.id}>{c.name}</option>)}
+            </select>
           </div>
 
-          <div className={styles.group}>
-            <label>Last Name</label>
-            <input type="text" name="last_name" value={form.last_name} onChange={handleChange} placeholder="Enter last name" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Temporary Password *</label>
+            <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="At least 8 characters" style={{ padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
           </div>
 
-          <div className={styles.group}>
-            <label>Email</label>
-            <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Enter email" />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", gridColumn: "1 / -1", marginTop: "0.5rem" }}>
+            <input type="checkbox" name="is_active" checked={form.is_active} onChange={handleChange} style={{ width: "18px", height: "18px" }} />
+            <label style={{ fontWeight: "bold", color: "#374151", fontSize: "14px", cursor: "pointer" }}>Account is Active</label>
           </div>
 
-          <div className={styles.group}>
-            <label>Phone Number</label>
-            <input type="tel" name="phone_number" value={form.phone_number} onChange={handleChange} placeholder="Enter phone number" />
-          </div>
-
-          <div className={styles.group}>
-            <label>Password</label>
-            <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Create a temporary password" />
-          </div>
-
-          <div className={styles.group}>
-            <label>Active</label>
-            <input type="checkbox" name="is_active" checked={form.is_active} onChange={handleChange} />
-          </div>
-
-          <div className={styles.buttons}>
-            <button type="submit" className={styles.saveBtn} disabled={loading}>
+          <div style={{ gridColumn: "1 / -1", display: "flex", gap: "1rem", marginTop: "1rem", borderTop: "1px solid #e5e7eb", paddingTop: "1.5rem" }}>
+            <button type="submit" disabled={loading} style={{ padding: "12px 24px", backgroundColor: "#2563eb", color: "white", borderRadius: "8px", border: "none", fontWeight: "bold", cursor: loading ? "not-allowed" : "pointer" }}>
               {loading ? "Saving..." : "Save Mentor"}
             </button>
-            <Link to="/admin/mentors" className={styles.cancelBtn}>
-              Cancel
-            </Link>
+            <Link to="/admin/mentors" style={{ padding: "12px 24px", backgroundColor: "#f3f4f6", color: "#374151", borderRadius: "8px", textDecoration: "none", fontWeight: "bold" }}>Cancel</Link>
           </div>
         </form>
       </div>

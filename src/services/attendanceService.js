@@ -31,4 +31,31 @@ export const attendanceService = {
     const response = await apiClient.delete(API_ENDPOINTS.ATTENDANCE.BY_ID(id));
     return response.data;
   },
+
+  async scheduleSession(data) {
+    // Standard Django REST Framework uses the base endpoint for POST/creation
+    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.BASE, data);
+    return response.data;
+  },
+
+  async whitelistGuest(sessionId, emails) {
+    // Expects an array of email strings
+    const response = await apiClient.post(`${API_ENDPOINTS.ATTENDANCE.BY_ID(sessionId)}whitelist/`, { emails });
+    return response.data;
+  },
+
+  async markJoined(id) {
+    const response = await apiClient.post(`${API_ENDPOINTS.ATTENDANCE.BY_ID(id)}join/`);
+    return response.data;
+  },
+
+  async getWarnings() {
+    const response = await apiClient.get(`${API_ENDPOINTS.ATTENDANCE.BASE}warnings/`);
+    return response.data;
+  },
+
+  async resolveWarning(warningId) {
+    const response = await apiClient.post(`${API_ENDPOINTS.ATTENDANCE.BASE}resolve_warning/`, { warning_id: warningId });
+    return response.data;
+  }
 };

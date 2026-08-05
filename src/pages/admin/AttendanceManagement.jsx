@@ -78,30 +78,45 @@ function AttendanceManagement() {
                 <th>Session</th>
                 <th>Cohort</th>
                 <th>Date</th>
-                <th>Attendees</th>
+                <th>Timings</th>
+                <th>Expected</th>
+                <th>Joined</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
-              {attendance.map((item) => (
+              {attendance.map((item) => {
+                const getDownloadLink = (item) => {
+                  const safeTitle = (item.title || "Attendance Session").replace(/ /g, "_").replace(/\//g, "-");
+                  const fileName = `${safeTitle}_${item.class_date}.csv`;
+                  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+                  const serverUrl = baseUrl.replace(/\/api\/?$/, "");
+                  return `${serverUrl}/media/attendance_reports/${fileName}`;
+                };
+
+                return (
                 <tr key={item.id}>
                   <td>{item.title || "Attendance Session"}</td>
                   <td>{getCohortName(item.cohort)}</td>
                   <td>{formatDate(item.class_date)}</td>
+                  <td>{item.start_time?.slice(0,5)} - {item.end_time ? item.end_time.slice(0,5) : "TBD"}</td>
                   <td>{Array.isArray(item.attendees) ? item.attendees.length : 0}</td>
+                  <td>{Array.isArray(item.joined_students) ? item.joined_students.length : 0}</td>
 
-                  <td className={item.conducted ? styles.present : styles.absent}>
-                    {item.conducted ? "Conducted" : "Cancelled"}
+                  <td className={item.conducted === false ? styles.absent : styles.present}>
+                    {item.conducted === false ? "Ended" : "Active"}
                   </td>
 
-                  <td className={styles.actions}>
+                  <td className={styles.actions} style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {item.conducted === false && (
+                       <a href={getDownloadLink(item)} target="_blank" rel="noreferrer" style={{background: "#16a34a", color: "white", padding: "6px 12px", borderRadius: "6px", textDecoration: "none", fontWeight: "bold", fontSize: "12px", display: "inline-block", textAlign: "center"}}>⬇️ CSV</a>
+                    )}
                     <Link to="/admin/attendance-details">View</Link>
-                    <Link to="/admin/attendance-history-admin">History</Link>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

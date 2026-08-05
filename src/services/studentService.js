@@ -23,6 +23,10 @@ const normalizeProfile = (profile = {}) => ({
   state: profile.state || "",
   pincode: profile.pincode || "",
   technicalSkills: profile.technicalSkills || profile.tagline || "",
+  // Existing student fields (Single courseBatch like G2-26)
+  isExistingStudent: profile.isExistingStudent || "no",
+  domain: profile.domain || "",
+  courseBatch: profile.courseBatch || profile.course_batch || "",
 });
 
 export const isProfileComplete = (profile = {}) => {
@@ -41,6 +45,9 @@ export const isProfileComplete = (profile = {}) => {
 };
 
 export const studentService = {
+  // ─── Utility Methods ──────────────────────────────────────────
+  isProfileComplete,
+
   // ─── Backend API Methods ──────────────────────────────────────
   async getStudentProfiles(params = {}) {
     const response = await apiClient.get(API_ENDPOINTS.STUDENTS.BASE, { params });
@@ -71,7 +78,8 @@ export const studentService = {
     const response = await apiClient.delete(API_ENDPOINTS.STUDENTS.BY_ID(id));
     return response.data;
   },
-
+  
+  
   // ─── Profile Methods (Backend-First with localStorage Fallback) ──
 
   /**
@@ -140,6 +148,10 @@ export const studentService = {
           graduationYear: profile.graduation_year || profile.graduationYear || "",
           address: profile.bio || profile.address || "",
           technicalSkills: profile.tagline || profile.technicalSkills || "",
+          // Map existing student fields
+          isExistingStudent: profile.is_existing_student ? "yes" : profile.isExistingStudent || "no",
+          domain: profile.domain || "",
+          courseBatch: profile.course_batch || profile.courseBatch || "",
         });
         localStorage.setItem(key, JSON.stringify(mapped));
         return mapped;
@@ -179,28 +191,50 @@ export const studentService = {
       phoneNumber: profileData.phoneNumber || existing.phoneNumber || "",
     };
 
-    localStorage.setItem(key, JSON.stringify(updated));
+    // Save to local storage but omit the File object to prevent JSON circular errors
+    const storageCopy = { ...updated, offerLetter: null };
+    localStorage.setItem(key, JSON.stringify(storageCopy));
 
     try {
       const profileResponse = await apiClient.get(API_ENDPOINTS.STUDENTS.BASE);
       const students = Array.isArray(profileResponse.data) ? profileResponse.data : [profileResponse.data];
       const backendProfile = students[0];
 
-      const payload = {
-        college: updated.collegeName || "",
-        degree: updated.degree || "",
-        specialization: updated.branch || "",
-        graduation_year: updated.graduationYear ? Number(updated.graduationYear) : null,
-        city: updated.city || "",
-        state: updated.state || "",
-        bio: updated.address || "",
-        tagline: updated.technicalSkills || "",
-      };
+      // Use FormData instead of JSON payload to support Offer Letter file uploads
+      const formData = new FormData();
+      formData.append("college", updated.collegeName || "");
+      formData.append("degree", updated.degree || "");
+      formData.append("specialization", updated.branch || "");
+      if (updated.graduationYear) {
+        formData.append("graduation_year", Number(updated.graduationYear));
+      }
+      formData.append("city", updated.city || "");
+      formData.append("state", updated.state || "");
+      formData.append("bio", updated.address || "");
+      formData.append("tagline", updated.technicalSkills || "");
+      
+      // Verification Fields
+      formData.append("is_existing_student", updated.isExistingStudent === "yes");
+      formData.append("domain", updated.domain || "");
+      formData.append("course_batch", updated.courseBatch || ""); // Single string like G2-26 VLSI
+
+      // 🚨 CRITICAL FIX: Allow frontend to force the status to Pending (NOT_AVAILABLE)
+      if (updated.status) {
+        formData.append("status", updated.status);
+      }
+
+      // Append file if exists
+      if (profileData.offerLetter) {
+        formData.append("offer_letter", profileData.offerLetter);
+      }
+
+      // Important: Use FormData in headers
+      const config = { headers: { "Content-Type": "multipart/form-data" } };
 
       if (backendProfile?.id) {
-        await this.patchStudentProfile(backendProfile.id, payload);
+        await apiClient.patch(API_ENDPOINTS.STUDENTS.BY_ID(backendProfile.id), formData, config);
       } else {
-        await this.createStudentProfile(payload);
+        await apiClient.post(API_ENDPOINTS.STUDENTS.BASE, formData, config);
       }
 
       const meResponse = await apiClient.get(API_ENDPOINTS.USERS.ME);

@@ -7,6 +7,7 @@ import Sidebar from "../components/layout/Sidebar";
 import styles from "./StudentLayout.module.css";
 
 const studentLinks = [
+  { label: "Dashboard", path: "/student/dashboard" },
   { label: "Profile", path: "/student/profile" },
   { label: "Apply Course", path: "/student/apply-course" },
   { label: "Applications", path: "/student/applications" },
