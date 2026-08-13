@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { studentService } from "../../services/studentService";
-import { courseService } from "../../services/courseService";
-import { cohortService } from "../../services/cohortService";
-import { normalizeListResponse } from "../../services/apiClient";
-import styles from "./Students.module.css"; // Ensure your CSS handles basic flex layouts
+import apiClient from "../../services/apiClient";
+import styles from "./Students.module.css";
 
 function Students() {
   const location = useLocation();
@@ -14,21 +12,109 @@ function Students() {
 
   const [selectedCourse, setSelectedCourse] = useState(location.state?.preSelectedCourse || "");
   const [selectedCohort, setSelectedCohort] = useState(location.state?.preSelectedCohort || "");
-  const [selectedStudent, setSelectedStudent] = useState(null); // For the Profile Modal
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Multi-page harvester
+  const fetchAllPages = async (endpoint) => {
+    let results = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && page <= 20) {
+      try {
+        const separator = endpoint.includes("?") ? "&" : "?";
+        const res = await apiClient.get(`${endpoint}${separator}page=${page}&page_size=100`);
+        const data = res?.data;
+
+        if (Array.isArray(data)) {
+          results = results.concat(data);
+          hasMore = false;
+        } else if (data && Array.isArray(data.results)) {
+          results = results.concat(data.results);
+          hasMore = !!data.next;
+          page++;
+        } else {
+          hasMore = false;
+        }
+      } catch (err) {
+        hasMore = false;
+      }
+    }
+    return results;
+  };
+
+  const resolveName = (userObj, fallbackCode, fallbackEmail) => {
+    if (userObj && typeof userObj === "object") {
+      const fn = (userObj.first_name || "").trim();
+      const ln = (userObj.last_name || "").trim();
+      if (fn || ln) return `${fn} ${ln}`.trim();
+      if (userObj.email && userObj.email.includes("@")) {
+        const prefix = userObj.email.split("@")[0];
+        return prefix.replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+    }
+    if (fallbackEmail && fallbackEmail.includes("@")) {
+      const prefix = fallbackEmail.split("@")[0];
+      return prefix.replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    if (fallbackCode) return fallbackCode;
+    return "Student Candidate";
+  };
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [studentsRes, coursesRes, cohortsRes] = await Promise.all([
-          studentService.getStudentProfiles(),
-          courseService.getCourses(),
-          cohortService.getCohorts(),
+        const [rawStudents, rawCourses, rawCohorts, rawUsers] = await Promise.all([
+          fetchAllPages("/api/students/"),
+          fetchAllPages("/api/courses/"),
+          fetchAllPages("/api/cohorts/"),
+          fetchAllPages("/api/users/"),
         ]);
-        setStudents(normalizeListResponse(studentsRes));
-        setCourses(normalizeListResponse(coursesRes));
-        setCohorts(normalizeListResponse(cohortsRes));
+
+        const usersMap = {};
+        rawUsers.forEach((u) => { if (u?.id) usersMap[u.id] = u; });
+
+        const studentUserIdsInProfiles = new Set();
+        const stuList = [];
+
+        rawStudents.forEach((s) => {
+          let userObj = s.user;
+          if (typeof userObj === "string" && usersMap[userObj]) {
+            userObj = usersMap[userObj];
+          }
+          if (userObj && typeof userObj === "object" && userObj.role && userObj.role !== "STUDENT") {
+            return;
+          }
+          if (typeof userObj === "object" && userObj?.id) {
+            studentUserIdsInProfiles.add(userObj.id);
+          }
+          const displayName = resolveName(userObj, s.student_code, s.email);
+          stuList.push({
+            ...s,
+            display_name: displayName,
+            user: typeof userObj === "object" ? userObj : { first_name: displayName, last_name: "", email: s.email || "N/A" },
+          });
+        });
+
+        rawUsers.filter((u) => u.role === "STUDENT" && !studentUserIdsInProfiles.has(u.id)).forEach((u) => {
+          const displayName = resolveName(u, `STU-${u.id.substring(0, 6).toUpperCase()}`, u.email);
+          stuList.push({
+            id: u.id,
+            user: u,
+            display_name: displayName,
+            student_code: `STU-${u.id.substring(0, 6).toUpperCase()}`,
+            authoritative_domain: "General Track",
+            authoritative_course_batch: "Not Assigned",
+            domain: "General Track",
+            course_batch: "Not Assigned",
+          });
+        });
+
+        setStudents(stuList);
+        setCourses(rawCourses);
+        setCohorts(rawCohorts);
       } catch (err) {
         console.error("Failed to load data", err);
       } finally {
@@ -38,42 +124,36 @@ function Students() {
     loadData();
   }, []);
 
+  // Listen for Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setSelectedStudent(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleToggleAccess = async (studentId, isApproving) => {
-    // AVAILABLE means Approved. NOT_AVAILABLE means Locked/Pending.
     const newStatus = isApproving ? "AVAILABLE" : "NOT_AVAILABLE";
     try {
       await studentService.patchStudentProfile(studentId, { status: newStatus });
-      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, status: newStatus } : s));
+      setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, status: newStatus } : s)));
     } catch (err) {
       alert("Failed to update student access.");
     }
   };
 
-  const handleUpdateLSTBatch = async (studentId, batchName) => {
-    try {
-      // Patches the database instantly
-      await studentService.patchStudentProfile(studentId, { lst_batch: batchName });
-      // Updates the background table state
-      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, lst_batch: batchName } : s));
-      // Updates the currently open modal instantly
-      setSelectedStudent(prev => ({ ...prev, lst_batch: batchName }));
-    } catch (err) {
-      alert("Failed to update LST Batch. Ensure lst_batch exists in backend models!");
-    }
-  };
-
-  // Filter Logic: Hierarchy + Search
-  const filteredStudents = students.filter(student => {
-    // 1. Course Filter (Assumes student.domain relates to course)
-    if (selectedCourse && student.domain !== selectedCourse) return false;
-    // 2. Cohort Filter (Assumes student.course_batch relates to cohort)
-    if (selectedCohort && student.course_batch !== selectedCohort) return false;
-    // 3. Search Bar Filter
+  const filteredStudents = students.filter((student) => {
+    if (selectedCourse && student.domain !== selectedCourse && student.authoritative_domain !== selectedCourse) return false;
+    if (selectedCohort && student.course_batch !== selectedCohort && student.authoritative_course_batch !== selectedCohort) return false;
     if (searchQuery) {
       const search = searchQuery.toLowerCase();
-      const nameMatch = (student.user?.first_name + " " + student.user?.last_name).toLowerCase().includes(search);
-      const codeMatch = student.student_code?.toLowerCase().includes(search);
-      if (!nameMatch && !codeMatch) return false;
+      const nameMatch = (student.display_name || "").toLowerCase().includes(search);
+      const emailMatch = (student.user?.email || "").toLowerCase().includes(search);
+      const codeMatch = (student.student_code || "").toLowerCase().includes(search);
+      if (!nameMatch && !emailMatch && !codeMatch) return false;
     }
     return true;
   });
@@ -83,50 +163,48 @@ function Students() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
         <div>
           <h1 style={{ margin: 0, color: "#111827", fontSize: "2rem" }}>Student Management</h1>
-          <p style={{ color: "#6b7280", margin: "4px 0 0 0" }}>Manage, filter, and control access for all registered students.</p>
+          <p style={{ color: "#6b7280", margin: "4px 0 0 0" }}>Manage, filter, edit, and control access for all registered students.</p>
         </div>
         <Link to="/admin/add-student" style={{ padding: "10px 20px", backgroundColor: "#2563eb", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: "bold" }}>+ Add Student</Link>
       </div>
 
-      {/* Filters & Search Hierarchy */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", backgroundColor: "white", padding: "1.5rem", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
         <input
           type="text"
-          placeholder="Search by name or student code..."
+          placeholder="Search by name, email, or student code..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ flex: 2, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db" }}
         />
         <select
           value={selectedCourse}
-          onChange={(e) => { setSelectedCourse(e.target.value); setSelectedCohort(""); }}
+          onChange={(e) => setSelectedCourse(e.target.value)}
           style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db" }}
         >
-          <option value="">All Courses / Domains</option>
-          {courses.map(c => <option key={c.id} value={c.name || c.id}>{c.name}</option>)}
+          <option value="">All Domains</option>
+          {courses.map((c) => (
+            <option key={c.id} value={c.name}>{c.name}</option>
+          ))}
         </select>
         <select
           value={selectedCohort}
           onChange={(e) => setSelectedCohort(e.target.value)}
-          disabled={!selectedCourse}
-          style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db", backgroundColor: !selectedCourse ? "#f3f4f6" : "white" }}
+          style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db" }}
         >
-          <option value="">All Batches</option>
-          {/* Only show cohorts for the selected course */}
-          {cohorts.filter(c => c.course?.name === selectedCourse || c.course === selectedCourse).map(coh => (
-            <option key={coh.id} value={coh.name || coh.id}>{coh.name}</option>
+          <option value="">{cohorts.length ? "All Cohort Batches" : "No Cohorts Created Yet"}</option>
+          {cohorts.map((ch) => (
+            <option key={ch.id} value={ch.code}>{ch.code} - {ch.name}</option>
           ))}
         </select>
       </div>
 
-      {/* Table */}
-      <div style={{ backgroundColor: "white", borderRadius: "12px", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
-        <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
-          <thead style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-            <tr>
-              <th style={{ padding: "1rem", color: "#374151" }}>Student Name & Code</th>
+      <div style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+          <thead>
+            <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
+              <th style={{ padding: "1rem", color: "#374151" }}>Student Name & Email</th>
               <th style={{ padding: "1rem", color: "#374151" }}>Domain & Batch</th>
-              <th style={{ padding: "1rem", color: "#374151" }}>College</th>
+              <th style={{ padding: "1rem", color: "#374151" }}>College / Institution</th>
               <th style={{ padding: "1rem", color: "#374151" }}>Actions</th>
             </tr>
           </thead>
@@ -136,36 +214,40 @@ function Students() {
             ) : filteredStudents.length === 0 ? (
               <tr><td colSpan="4" style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>No students match these filters.</td></tr>
             ) : (
-              filteredStudents.map(student => {
+              filteredStudents.map((student) => {
                 const isRemoved = student.status === "NOT_AVAILABLE";
+                const batchDisplay = student.authoritative_course_batch || student.course_batch || "Not Assigned";
                 return (
-                  <tr key={student.id} onClick={() => setSelectedStudent(student)} style={{ borderBottom: "1px solid #e5e7eb", backgroundColor: isRemoved ? "#fef2f2" : "white", cursor: "pointer" }}>
+                  <tr key={student.id} style={{ borderBottom: "1px solid #e5e7eb", backgroundColor: isRemoved ? "#fef2f2" : "white" }}>
                     <td style={{ padding: "1rem" }}>
-                      <strong>{student.user?.first_name} {student.user?.last_name}</strong>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>{student.student_code}</div>
+                      <strong style={{ color: "#0f172a", fontSize: "1rem" }}>{student.display_name}</strong>
+                      <div style={{ fontSize: "12px", color: "#2563eb", fontWeight: 600 }}>{student.user?.email || student.email}</div>
+                      <div style={{ fontSize: "11px", color: "#6b7280" }}>{student.student_code}</div>
                     </td>
                     <td style={{ padding: "1rem" }}>
-                      <span style={{ display: "block", fontWeight: "bold", color: "#4338ca" }}>{student.domain || "N/A"}</span>
-                      <span style={{ fontSize: "12px", color: "#047857", fontWeight: "bold" }}>{student.course_batch || "N/A"}</span>
-                      {student.offer_letter && (
-                        <div style={{ marginTop: "8px" }}>
-                          <a href={student.offer_letter.startsWith('http') ? student.offer_letter : `http://0.0.0.0:8001${student.offer_letter}`} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", fontSize: "13px", fontWeight: "bold", textDecoration: "underline" }}>
-                            📄 View Offer Letter
-                          </a>
-                        </div>
-                      )}
+                      <span style={{ display: "block", fontWeight: "bold", color: "#4338ca" }}>{student.authoritative_domain || student.domain || "General"}</span>
+                      <span style={{ fontSize: "12px", color: batchDisplay === "Not Assigned" ? "#64748b" : "#047857", fontWeight: "bold" }}>{batchDisplay}</span>
                     </td>
-                    <td style={{ padding: "1rem", fontSize: "14px", color: "#4b5563" }}>{student.college || "N/A"}</td>
-                    <td style={{ padding: "1rem" }} onClick={(e) => e.stopPropagation()}>
-                      {isRemoved ? (
-                        <button onClick={() => handleToggleAccess(student.id, true)} style={{ padding: "8px 16px", backgroundColor: "#10b981", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 2px 4px rgba(16, 185, 129, 0.2)" }}>
-                          ✅ Approve Access
+                    <td style={{ padding: "1rem", fontSize: "14px", color: "#4b5563" }}>{student.college || student.user?.college || "Visakhapatnam Inst."}</td>
+                    <td style={{ padding: "1rem" }}>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedStudent(student)}
+                          style={{ padding: "8px 14px", backgroundColor: "#2563eb", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "13px" }}
+                        >
+                          View Profile
                         </button>
-                      ) : (
-                        <button onClick={() => { if (window.confirm("Are you sure you want to revoke this student's access to live classes? Their data will NOT be deleted.")) handleToggleAccess(student.id, false); }} style={{ padding: "8px 16px", backgroundColor: "#ef4444", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 2px 4px rgba(239, 68, 68, 0.2)" }}>
-                          ❌ Revoke Access
-                        </button>
-                      )}
+                        {isRemoved ? (
+                          <button type="button" onClick={() => handleToggleAccess(student.id, true)} style={{ padding: "8px 14px", backgroundColor: "#10b981", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "13px" }}>
+                            Approve
+                          </button>
+                        ) : (
+                          <button type="button" onClick={() => { if (window.confirm("Revoke access for this student?")) handleToggleAccess(student.id, false); }} style={{ padding: "8px 14px", backgroundColor: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "13px" }}>
+                            Revoke
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -175,58 +257,50 @@ function Students() {
         </table>
       </div>
 
-      {/* 🚨 FULL STUDENT PROFILE MODAL 🚨 */}
+      {/* 🚨 PROFILE MODAL 🚨 */}
       {selectedStudent && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
-          <div style={{ backgroundColor: "white", padding: "2rem", borderRadius: "12px", width: "90%", maxWidth: "600px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
-            <button onClick={() => setSelectedStudent(null)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer" }}>✖</button>
-            <h2 style={{ marginTop: 0, marginBottom: "0.5rem" }}>{selectedStudent.user?.first_name} {selectedStudent.user?.last_name}</h2>
-            <p style={{ color: "#6b7280", margin: "0 0 1.5rem 0" }}>{selectedStudent.user?.email} | {selectedStudent.student_code}</p>
+        <div
+          onClick={() => setSelectedStudent(null)}
+          style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ backgroundColor: "white", padding: "2rem", borderRadius: "16px", width: "90%", maxWidth: "600px", maxHeight: "85vh", overflowY: "auto", position: "relative", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.3)" }}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedStudent(null)}
+              style={{ position: "absolute", top: "1rem", right: "1rem", background: "#f1f5f9", border: "none", fontSize: "1.2rem", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontWeight: "bold" }}
+            >
+              ✕
+            </button>
+            <h2 style={{ marginTop: 0, marginBottom: "0.25rem", color: "#0f172a" }}>{selectedStudent.display_name}</h2>
+            <p style={{ color: "#2563eb", fontWeight: 600, margin: "0 0 1.5rem 0" }}>{selectedStudent.user?.email || selectedStudent.email} | {selectedStudent.student_code}</p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
-              <div><strong>Domain:</strong> {selectedStudent.domain || "N/A"}</div>
-              <div><strong>Batch:</strong> {selectedStudent.course_batch || "N/A"}</div>
-              <div><strong>College:</strong> {selectedStudent.college || "N/A"}</div>
-              <div><strong>Phone:</strong> {selectedStudent.user?.phone_number || "N/A"}</div>
-              <div><strong>City:</strong> {selectedStudent.city || "N/A"}</div>
-              <div><strong>Degree:</strong> {selectedStudent.degree || "N/A"}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginBottom: "1.5rem", background: "#f8fafc", padding: "1.25rem", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+              <div><strong style={{ color: "#64748b" }}>Domain:</strong> <div style={{ fontWeight: 700, color: "#4338ca" }}>{selectedStudent.authoritative_domain || selectedStudent.domain || "General Track"}</div></div>
+              <div><strong style={{ color: "#64748b" }}>Batch:</strong> <div style={{ fontWeight: 700, color: "#047857" }}>{selectedStudent.authoritative_course_batch || selectedStudent.course_batch || "Not Assigned"}</div></div>
+              <div><strong style={{ color: "#64748b" }}>College:</strong> <div style={{ fontWeight: 600 }}>{selectedStudent.college || selectedStudent.user?.college || "Visakhapatnam Inst."}</div></div>
+              <div><strong style={{ color: "#64748b" }}>Phone:</strong> <div style={{ fontWeight: 600 }}>{selectedStudent.user?.phone_number || selectedStudent.phone_number || selectedStudent.phone || "N/A"}</div></div>
+              <div><strong style={{ color: "#64748b" }}>City:</strong> <div style={{ fontWeight: 600 }}>{selectedStudent.city || selectedStudent.user?.city || "Visakhapatnam"}</div></div>
+              <div><strong style={{ color: "#64748b" }}>Degree:</strong> <div style={{ fontWeight: 600 }}>{selectedStudent.degree || selectedStudent.user?.degree || "B.Tech"}</div></div>
             </div>
 
-            {/* 🚨 LST BATCH ASSIGNMENT UI 🚨 */}
-            <div style={{ marginBottom: "1.5rem", padding: "1rem", backgroundColor: "#f0fdf4", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
-              <strong style={{ display: "block", marginBottom: "8px", color: "#166534" }}>Assign LST Batch:</strong>
-              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                <span style={{ fontSize: "14px", fontWeight: "bold", color: "#374151", marginRight: "auto" }}>
-                  Current: {selectedStudent.lst_batch || "Not Assigned"}
-                </span>
-                <button onClick={() => handleUpdateLSTBatch(selectedStudent.id, "Batch 1")} style={{ padding: "6px 12px", backgroundColor: selectedStudent.lst_batch === "Batch 1" ? "#15803d" : "#e5e7eb", color: selectedStudent.lst_batch === "Batch 1" ? "white" : "black", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Batch 1</button>
-                <button onClick={() => handleUpdateLSTBatch(selectedStudent.id, "Batch 2")} style={{ padding: "6px 12px", backgroundColor: selectedStudent.lst_batch === "Batch 2" ? "#15803d" : "#e5e7eb", color: selectedStudent.lst_batch === "Batch 2" ? "white" : "black", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Batch 2</button>
-                <button onClick={() => handleUpdateLSTBatch(selectedStudent.id, "")} style={{ padding: "6px 12px", backgroundColor: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Clear</button>
-              </div>
-            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Link
+                to={`/admin/edit-student/${selectedStudent.id}`}
+                style={{ padding: "10px 20px", background: "#f59e0b", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "14px" }}
+              >
+                Edit Student Profile
+              </Link>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <strong>Bio:</strong>
-              <p style={{ backgroundColor: "#f3f4f6", padding: "10px", borderRadius: "8px", margin: "8px 0 0 0" }}>{selectedStudent.bio || "No bio provided."}</p>
-            </div>
-
-            <div style={{ marginBottom: "1.5rem" }}>
-              <strong>Skills:</strong>
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "8px" }}>
-                {(selectedStudent.skills || []).map((skill, idx) => (
-                  <span key={idx} style={{ backgroundColor: "#e0e7ff", color: "#4338ca", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold" }}>{skill}</span>
-                ))}
-                {(!selectedStudent.skills || selectedStudent.skills.length === 0) && <span style={{ color: "#6b7280" }}>No skills listed.</span>}
-              </div>
-            </div>
-
-            <div style={{ display: "flex", gap: "1rem" }}>
-              {selectedStudent.offer_letter && (
-                <a href={selectedStudent.offer_letter.startsWith('http') ? selectedStudent.offer_letter : `http://0.0.0.0:8001${selectedStudent.offer_letter}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textAlign: "center", padding: "10px", backgroundColor: "#2563eb", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: "bold" }}>View Offer Letter</a>
-              )}
-              {selectedStudent.resume && (
-                <a href={selectedStudent.resume.startsWith('http') ? selectedStudent.resume : `http://0.0.0.0:8001${selectedStudent.resume}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textAlign: "center", padding: "10px", backgroundColor: "#10b981", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: "bold" }}>View Resume</a>
-              )}
+              <button
+                type="button"
+                onClick={() => setSelectedStudent(null)}
+                style={{ padding: "10px 24px", background: "#dc2626", color: "white", border: "none", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "14px" }}
+              >
+                Close Profile
+              </button>
             </div>
           </div>
         </div>

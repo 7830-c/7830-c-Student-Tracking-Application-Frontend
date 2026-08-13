@@ -62,7 +62,8 @@
   gap: 12px;
 }
 
-.signupBtn {
+.signupBtn,
+.loginBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -70,11 +71,18 @@
   padding: 0 20px;
   border-radius: var(--radius-md);
   text-decoration: none;
-  color: var(--primary-color);
-  border: 1.5px solid var(--primary-color);
   font-weight: 600;
   font-size: 14px;
+  line-height: 1;
+  box-sizing: border-box;
+  margin: 0;
+  vertical-align: middle;
   transition: all var(--transition-fast);
+}
+
+.signupBtn {
+  color: var(--primary-color);
+  border: 1.5px solid var(--primary-color);
   background: transparent;
 }
 
@@ -84,19 +92,8 @@
 }
 
 .loginBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: var(--button-height);
-  padding: 0 20px;
-  border-radius: var(--radius-md);
-  text-decoration: none;
   background: var(--primary-color);
   color: #ffffff;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all var(--transition-fast);
   border: 1.5px solid var(--primary-color);
   cursor: pointer;
 }

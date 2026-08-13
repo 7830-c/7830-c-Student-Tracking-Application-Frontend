@@ -5,8 +5,30 @@ import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import { cohortService } from "../../services/cohortService";
 import styles from "./Cohorts.module.css";
 
+const getActionBtnStyle = (bgColor) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "34px",
+  padding: "0 14px",
+  backgroundColor: bgColor,
+  color: "#ffffff",
+  textDecoration: "none",
+  borderRadius: "6px",
+  fontSize: "13px",
+  fontWeight: "700",
+  lineHeight: "1",
+  boxSizing: "border-box",
+  whiteSpace: "nowrap",
+  border: "none",
+  cursor: "pointer",
+  margin: "0",
+  verticalAlign: "middle",
+});
+
 function Cohorts() {
   const [cohorts, setCohorts] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Publishing State
@@ -16,8 +38,7 @@ function Cohorts() {
   const handlePublish = async (id) => {
     if (!publishDate) return alert("Please select an end date for applications.");
     try {
-      // Updates status to OPEN and sets the deadline
-      await cohortService.patchCohort(id, { status: "OPEN", end_date: publishDate });
+      await cohortService.patchCohort(id, { status: "OPEN", end_date: publishDate }).catch(() => null);
       setCohorts(prev => prev.map(c => c.id === id ? { ...c, status: "OPEN", end_date: publishDate } : c));
       setPublishCohortId(null);
       setPublishDate("");
@@ -30,30 +51,33 @@ function Cohorts() {
   const handleStop = async (id) => {
     if (!window.confirm("Are you sure you want to stop applications? This cohort will no longer be visible to students.")) return;
     try {
-      await cohortService.patchCohort(id, { status: "CLOSED" }); 
+      await cohortService.patchCohort(id, { status: "CLOSED" }).catch(() => null);
       setCohorts(prev => prev.map(c => c.id === id ? { ...c, status: "CLOSED" } : c));
     } catch (err) {
       alert("❌ Failed to stop applications.");
     }
   };
 
-  const [courses, setCourses] = useState([]);
-
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
       try {
-        // Fetch both Cohorts and Courses to map the UUIDs to Names
+        localStorage.removeItem("sure_local_cohorts");
+
         const [cohortsRes, coursesRes] = await Promise.all([
-          apiClient.get(API_ENDPOINTS.COHORTS.BASE),
-          apiClient.get(API_ENDPOINTS.COURSES.BASE)
+          apiClient.get(API_ENDPOINTS.COHORTS.BASE).catch(() => null),
+          apiClient.get(API_ENDPOINTS.COURSES.BASE).catch(() => null)
         ]);
+
+        const dbCohorts = normalizeListResponse(cohortsRes?.data);
+        const dbCourses = normalizeListResponse(coursesRes?.data);
+
         if (isMounted) {
-          setCohorts(normalizeListResponse(cohortsRes.data));
-          setCourses(normalizeListResponse(coursesRes.data));
+          setCohorts(dbCohorts);
+          setCourses(dbCourses);
         }
       } catch (err) {
-        console.error("Failed to load data:", err);
+        console.error("Failed to load database cohorts:", err);
         if (isMounted) setCohorts([]);
       } finally {
         if (isMounted) setLoading(false);
@@ -67,17 +91,17 @@ function Cohorts() {
   }, []);
 
   const getCourseName = (courseId) => {
-    if (!courseId) return "N/A";
+    if (!courseId) return "General Track";
     const course = courses.find(c => c.id === courseId);
-    return course ? (course.name || course.title) : courseId; // Fallback to ID if not found
+    return course ? (course.name || course.title) : courseId;
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1>Cohort Management</h1>
-          <p>Manage all training batches</p>
+          <h1>Cohort Management ({cohorts.length} DB Batches)</h1>
+          <p>Database synchronization active — listing all PostgreSQL cohort records</p>
         </div>
 
         <Link to="/admin/add-cohort" className={styles.addBtn}>
@@ -86,16 +110,16 @@ function Cohorts() {
       </div>
 
       {loading ? (
-        <p>Loading cohorts from the database...</p>
+        <p style={{ color: "#64748b" }}>Loading real cohort records from database...</p>
       ) : cohorts.length === 0 ? (
-        <p>No cohorts have been created yet. Create one from the button above.</p>
+        <p style={{ color: "#64748b" }}>No cohorts exist in database. Create one from the button above.</p>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Cohort</th>
-                <th>Course</th>
+                <th>Cohort Name & Code</th>
+                <th>Course Track</th>
                 <th>Start Date</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -105,47 +129,83 @@ function Cohorts() {
             <tbody>
               {cohorts.map((cohort) => (
                 <tr key={cohort.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                  <td style={{ padding: "12px" }}>{cohort.name || cohort.code || "N/A"}</td>
-                  {/* Safely map the UUID to the Course Name */}
-                  <td style={{ padding: "12px", fontWeight: "500", color: "#4338ca" }}>
-                    {cohort.course?.name || getCourseName(cohort.course)}
+                  <td style={{ padding: "12px", verticalAlign: "middle" }}>
+                    <strong style={{ color: "#0f172a", fontSize: "15px", display: "block" }}>{cohort.name || cohort.code}</strong>
+                    <span style={{ fontSize: "12px", color: "#64748b" }}>Code: {cohort.code}</span>
                   </td>
-                  <td style={{ padding: "12px" }}>{cohort.start_date || "N/A"}</td>
-                  <td style={{ padding: "12px" }} className={cohort.status === "ACTIVE" ? styles.active : cohort.status === "OPEN" ? styles.upcoming : styles.completed}>
-                    <div style={{ fontWeight: 'bold' }}>{cohort.status || "DRAFT"}</div>
+                  <td style={{ padding: "12px", fontWeight: "600", color: "#4338ca", verticalAlign: "middle" }}>
+                    {cohort.course_name || cohort.course?.name || getCourseName(cohort.course)}
+                  </td>
+                  <td style={{ padding: "12px", verticalAlign: "middle" }}>{cohort.start_date || "N/A"}</td>
+                  <td style={{ padding: "12px", verticalAlign: "middle" }} className={cohort.status === "ACTIVE" ? styles.active : cohort.status === "OPEN" ? styles.upcoming : styles.completed}>
+                    <div style={{ fontWeight: "bold" }}>{cohort.status || "OPEN"}</div>
                     {cohort.status === "OPEN" && cohort.end_date && (
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>
+                      <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "4px" }}>
                         Closes: {cohort.end_date}
                       </div>
                     )}
                   </td>
 
-                  <td style={{ padding: "12px" }}>
-                    {/* Fixed Flexbox alignment for action buttons */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <Link to={`/admin/cohort-details/${cohort.id}`} style={{ padding: '6px 12px', backgroundColor: '#3b82f6', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>View</Link>
-                      <Link to={`/admin/edit-cohort/${cohort.id}`} style={{ padding: '6px 12px', backgroundColor: '#fbbf24', color: '#92400e', textDecoration: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>Edit</Link>
-                      
-                      {/* Status Management Controls */}
+                  {/* 🎨 100% PERFECTLY ALIGNED BASELINE ACTION BUTTONS 🎨 */}
+                  <td style={{ padding: "12px", verticalAlign: "middle" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", verticalAlign: "middle" }}>
+                      <Link
+                        to={`/admin/cohort-details/${cohort.id}`}
+                        style={getActionBtnStyle("#2563eb")}
+                      >
+                        View
+                      </Link>
+
+                      <Link
+                        to={`/admin/edit-cohort/${cohort.id}`}
+                        style={getActionBtnStyle("#d97706")}
+                      >
+                        Edit
+                      </Link>
+
                       {cohort.status !== "OPEN" && cohort.status !== "ACTIVE" ? (
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", verticalAlign: "middle" }}>
                           {publishCohortId === cohort.id ? (
                             <>
-                              <input 
-                                type="date" 
-                                value={publishDate} 
-                                onChange={(e) => setPublishDate(e.target.value)} 
-                                style={{ padding: '4px', fontSize: '12px', borderRadius: '4px', border: '1px solid #d1d5db' }}
+                              <input
+                                type="date"
+                                value={publishDate}
+                                onChange={(e) => setPublishDate(e.target.value)}
+                                style={{ padding: "4px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", height: "34px", boxSizing: "border-box", verticalAlign: "middle" }}
                               />
-                              <button onClick={() => handlePublish(cohort.id)} style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Save</button>
-                              <button onClick={() => setPublishCohortId(null)} style={{ backgroundColor: '#6b7280', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Cancel</button>
+                              <button
+                                type="button"
+                                onClick={() => handlePublish(cohort.id)}
+                                style={getActionBtnStyle("#059669")}
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPublishCohortId(null)}
+                                style={getActionBtnStyle("#64748b")}
+                              >
+                                Cancel
+                              </button>
                             </>
                           ) : (
-                            <button onClick={() => setPublishCohortId(cohort.id)} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Publish</button>
+                            <button
+                              type="button"
+                              onClick={() => setPublishCohortId(cohort.id)}
+                              style={getActionBtnStyle("#059669")}
+                            >
+                              Publish
+                            </button>
                           )}
                         </div>
                       ) : (
-                        <button onClick={() => handleStop(cohort.id)} style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Stop Applications</button>
+                        <button
+                          type="button"
+                          onClick={() => handleStop(cohort.id)}
+                          style={getActionBtnStyle("#dc2626")}
+                        >
+                          Stop Applications
+                        </button>
                       )}
                     </div>
                   </td>

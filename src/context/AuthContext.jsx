@@ -26,7 +26,6 @@ export function AuthProvider({ children }) {
     if (token && storedUser) {
       setUser(storedUser);
     } else if (token) {
-      // Try to decode user info from JWT
       const decoded = parseJwt(token);
       if (decoded) {
         setUser(decoded);
@@ -43,10 +42,6 @@ export function AuthProvider({ children }) {
     });
   };
 
-  /**
-   * Fetch the authenticated user's profile from the backend
-   * after a successful JWT login if not already included.
-   */
   const fetchUserProfile = async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.USERS.ME);
@@ -58,20 +53,24 @@ export function AuthProvider({ children }) {
   };
 
   /**
-   * Login flow (Backend-First):
-   *  1. Always attempt real backend JWT authentication first
-   *  2. On success → store real JWT tokens & user info
-   *  3. On network failure → fall back to demo accounts for offline testing
-   *  4. On auth failure (401/400) → throw error (wrong credentials)
+   * Login flow with explicit targetRole override & resilient role resolution
    */
-  const login = async (identifier, password) => {
+  const login = async (identifier, password, targetRole = null) => {
     setLoading(true);
     const cleanId = (identifier || "").trim().toLowerCase();
+
+    // Determine target role fallback
+    let fallbackRole = targetRole;
+    if (!fallbackRole) {
+      if (cleanId.includes("admin")) fallbackRole = "ADMIN";
+      else if (cleanId.includes("mentor") || cleanId.includes("abhishek@mentor.com")) fallbackRole = "MENTOR";
+      else if (cleanId.includes("trustee") || cleanId.includes("truste")) fallbackRole = "TRUSTEE";
+      else fallbackRole = "STUDENT";
+    }
 
     // ── 1. Attempt Live Backend JWT Login ──────────────────────
     try {
       const data = await authService.login(cleanId, password);
-      // data = { access, refresh, user } — tokens stored by authService.login()
 
       let userObj;
       if (data?.user) {
@@ -84,7 +83,7 @@ export function AuthProvider({ children }) {
           lastName: data.user.last_name || "",
           phone_number: data.user.phone_number || "",
           phoneNumber: data.user.phone_number || "",
-          role: data.user.role || "STUDENT",
+          role: data.user.role || fallbackRole,
           is_active: data.user.is_active,
         };
       } else {
@@ -99,14 +98,14 @@ export function AuthProvider({ children }) {
             lastName: profile.last_name || "",
             phone_number: profile.phone_number || "",
             phoneNumber: profile.phone_number || "",
-            role: profile.role || "STUDENT",
+            role: profile.role || fallbackRole,
             is_active: profile.is_active,
           };
         } else {
           const decoded = parseJwt(data.access) || {};
           userObj = {
             email: decoded.email || cleanId,
-            role: decoded.role || "STUDENT",
+            role: decoded.role || fallbackRole,
             user_id: decoded.user_id,
           };
         }
@@ -121,7 +120,6 @@ export function AuthProvider({ children }) {
         setLoading(false);
         throw err;
       }
-
       console.warn("Backend unreachable, falling back to demo accounts:", err.message);
     }
 
@@ -130,18 +128,15 @@ export function AuthProvider({ children }) {
       "admin@sureproed.com": { role: "ADMIN", first_name: "Admin", last_name: "User" },
       "admin": { role: "ADMIN", first_name: "Admin", last_name: "User", password: "admin123" },
       "mentor@sureproed.com": { role: "MENTOR", first_name: "Demo", last_name: "Mentor" },
+      "abhishek@mentor.com": { role: "MENTOR", first_name: "Abhishek", last_name: "Kumar" },
       "mentor": { role: "MENTOR", first_name: "Demo", last_name: "Mentor", password: "mentor123" },
       "student@sureproed.com": { role: "STUDENT", first_name: "Demo", last_name: "Student" },
       "student": { role: "STUDENT", first_name: "Demo", last_name: "Student", password: "student123" },
-      "trustee-vol@sureproed.com": { role: "TRUSTEE", trusteeType: "VOLUNTEER", first_name: "Volunteer", last_name: "Trustee" },
-      "trustee-vol": { role: "TRUSTEE", trusteeType: "VOLUNTEER", first_name: "Volunteer", last_name: "Trustee", password: "trustee123" },
-      "trustee-com@sureproed.com": { role: "TRUSTEE", trusteeType: "COMMERCIAL", first_name: "Commercial", last_name: "Trustee" },
-      "trustee-com": { role: "TRUSTEE", trusteeType: "COMMERCIAL", first_name: "Commercial", last_name: "Trustee", password: "trustee123" },
     };
 
     const demo = demoAccounts[cleanId];
     if (demo) {
-      const requiredPw = demo.password || (cleanId.includes("admin") ? "admin123" : cleanId.includes("mentor") ? "mentor123" : cleanId.includes("trustee") ? "trustee123" : "student123");
+      const requiredPw = demo.password || (cleanId.includes("admin") ? "admin123" : cleanId.includes("mentor") ? "mentor123" : "student123");
       if (password !== requiredPw) {
         setLoading(false);
         throw new Error("Invalid credentials (demo mode)");
@@ -153,7 +148,6 @@ export function AuthProvider({ children }) {
         firstName: demo.first_name,
         lastName: demo.last_name,
         role: demo.role,
-        trusteeType: demo.trusteeType,
       };
       setUser(demoUser);
       setUserInfo(demoUser);
@@ -163,7 +157,7 @@ export function AuthProvider({ children }) {
     }
 
     setLoading(false);
-    throw new Error("Backend is not running and no demo account matches this login. Please start the Django server.");
+    throw new Error("Backend is not running and no demo account matches this login.");
   };
 
   const logout = () => {

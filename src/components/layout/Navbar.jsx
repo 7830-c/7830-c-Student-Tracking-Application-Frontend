@@ -55,7 +55,7 @@ function Navbar() {
               <Link to={getDashboardPath()} onClick={closeMenu} className={styles.signupBtn}>
                 My Account
               </Link>
-              <button onClick={handleLogout} className={styles.loginBtn} style={{ cursor: "pointer", border: "none" }}>
+              <button type="button" onClick={handleLogout} className={styles.loginBtn}>
                 Sign Out
               </button>
             </>

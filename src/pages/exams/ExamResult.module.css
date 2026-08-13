@@ -69,6 +69,33 @@
   color: #4b5563;
 }
 
+.auditClean {
+  margin-top: 20px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.auditWarning {
+  margin-top: 20px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
 .button {
   background: #2563eb;
   color: white;
@@ -78,8 +105,25 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
+  transition: background 0.2s;
 }
 
 .button:hover {
   background: #1d4ed8;
+}
+
+.secondaryButton {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 14px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.secondaryButton:hover {
+  background: #e2e8f0;
 }

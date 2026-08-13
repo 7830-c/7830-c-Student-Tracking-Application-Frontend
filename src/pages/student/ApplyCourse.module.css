@@ -47,13 +47,14 @@
 .badge {
   display: inline-flex;
   width: fit-content;
-  padding: 4px 10px;
-  background: var(--status-active-bg);
-  color: var(--status-active-text);
+  padding: 6px 16px;
   border-radius: 50px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #ffffff !important;
+  letter-spacing: 0.4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 .courseCard h2 {

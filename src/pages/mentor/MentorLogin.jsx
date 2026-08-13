@@ -18,7 +18,7 @@ function MentorLogin() {
     setLoading(true);
 
     try {
-      const res = await login(username, password);
+      const res = await login(username, password, "MENTOR");
       const userRole = res?.user?.role;
       if (userRole === "MENTOR") {
         navigate("/mentor/dashboard");
@@ -51,20 +51,14 @@ function MentorLogin() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
         <h1>Mentor Login</h1>
-
-        <p>
-          Login to access the Sure ProEd Mentor Portal.
-        </p>
+        <p>Login to access the Sure ProEd Mentor Portal.</p>
 
         {error && <div style={{ color: "#dc2626", marginBottom: "1rem", fontSize: "14px", backgroundColor: "#fef2f2", padding: "0.5rem", borderRadius: "4px" }}>❌ {error}</div>}
 
         <form onSubmit={handleLogin}>
-
           <div className={styles.group}>
             <label>Username / Email</label>
-
             <input
               type="text"
               placeholder="Enter Mentor Email or 'mentor'"
@@ -76,7 +70,6 @@ function MentorLogin() {
 
           <div className={styles.group}>
             <label>Password</label>
-
             <input
               type="password"
               placeholder="Enter Password"
@@ -97,9 +90,7 @@ function MentorLogin() {
           <p style={{ marginTop: "1rem", textAlign: "center", fontSize: "13px" }}>
             <Link to="/login">← Back to Student Login</Link>
           </p>
-
         </form>
-
       </div>
     </div>
   );

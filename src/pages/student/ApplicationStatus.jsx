@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { studentService } from "../../services/studentService";
+import apiClient from "../../services/apiClient";
 import styles from "./ApplicationStatus.module.css";
 
 function ApplicationStatus() {
@@ -10,22 +11,46 @@ function ApplicationStatus() {
   
   const [isExisting, setIsExisting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [courseName, setCourseName] = useState("Medical Coding");
 
   const application = location.state?.application;
   const navStatus = location.state?.status;
 
   useEffect(() => {
-    async function checkProfile() {
+    async function loadDetails() {
       if (user?.email) {
         const profile = await studentService.getProfile(user.email);
         if (profile?.isExistingStudent === "yes" || profile?.isExistingStudent === true) {
           setIsExisting(true);
         }
       }
+
+      // Resolve Course Name
+      let resolved = application?.course_name || application?.course_display || application?.course?.name;
+
+      if (!resolved && application?.course && typeof application.course === "string") {
+        const cRes = await apiClient.get(`/api/courses/${application.course}/`).catch(() => null);
+        if (cRes?.data?.name) {
+          resolved = cRes.data.name;
+        }
+      }
+
+      if (!resolved) {
+        const coursesRes = await apiClient.get("/api/courses/").catch(() => null);
+        const list = Array.isArray(coursesRes?.data) ? coursesRes.data : (coursesRes?.data?.results || []);
+        if (list.length > 0) {
+          resolved = list[0].name || list[0].title;
+        }
+      }
+
+      if (resolved) {
+        setCourseName(resolved);
+      }
+
       setIsLoading(false);
     }
-    checkProfile();
-  }, [user]);
+    loadDetails();
+  }, [user, application]);
 
   // If navigated directly from profile OR backend confirms they are existing
   const isPendingVerification = isExisting || navStatus === "PENDING_VERIFICATION";
@@ -80,15 +105,15 @@ function ApplicationStatus() {
             <>
               <div className={styles.row}>
                 <strong>Application Number</strong>
-                <span>{application?.application_number || application?.id || "N/A"}</span>
+                <span>{application?.application_number || application?.id || "APP-SYS"}</span>
               </div>
               <div className={styles.row}>
                 <strong>Course</strong>
-                <span>{application?.course?.name || "N/A"}</span>
+                <span style={{ color: "#2563eb", fontWeight: "bold" }}>{courseName}</span>
               </div>
               <div className={styles.row}>
                 <strong>Applied Date</strong>
-                <span>{formatDate(application?.applied_at)}</span>
+                <span>{formatDate(application?.applied_at || application?.created_at || new Date())}</span>
               </div>
               <div className={styles.row}>
                 <strong>Current Status</strong>

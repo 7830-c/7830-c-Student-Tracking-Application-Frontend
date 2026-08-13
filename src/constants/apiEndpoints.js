@@ -46,7 +46,13 @@ export const API_ENDPOINTS = {
   EXAMS: {
     BASE: "/api/exams/",
     BY_ID: (id) => `/api/exams/${id}/`,
+    ACTIVE: "/api/exams/active/",
+    START: "/api/exams/start/",
+    SYNC: (id) => `/api/exams/${id}/sync/`,
     SUBMIT: (id) => `/api/exams/${id}/submit/`,
+    CONFIG: "/api/exams/config/",
+    REPORTS: "/api/exams/reports/",
+    EXPORT_CSV: "/api/exams/export-csv/",
   },
   QUESTIONS: {
     BASE: "/api/questions/",
@@ -80,6 +86,12 @@ export const API_ENDPOINTS = {
   COMPANIES: {
     BASE: "/api/companies/",
     BY_ID: (id) => `/api/companies/${id}/`,
+  },
+
+  // Mentors
+  MENTORS: {
+    BASE: "/api/mentor-profile/",
+    BY_ID: (id) => `/api/mentor-profile/${id}/`,
   },
 
   // Trustee

@@ -182,6 +182,13 @@ function AppRoutes() {
           <Route path="/trustee/login" element={<TrusteeLogin />} />
         </Route>
 
+        {/* Standalone Full-Screen Exam Routes (No Navbars, No Sidebars) */}
+        <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} redirectTo="/login" />}>
+          <Route path="/student/exam-instructions" element={<ExamInstructions />} />
+          <Route path="/student/exam" element={<Exam />} />
+          <Route path="/student/exam-result" element={<ExamResult />} />
+        </Route>
+
         {/* ================= STUDENT MODULE (PROTECTED) ================= */}
         <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} redirectTo="/login" />}>
           <Route path="/student" element={<StudentLayout />}>
@@ -195,18 +202,14 @@ function AppRoutes() {
             <Route path="course/:id" element={<CourseDetails />} />
 
             <Route path="applications" element={<MyApplications />} />
+            <Route path="my-applications" element={<MyApplications />} />
             <Route path="application-success" element={<ApplicationSuccess />} />
             <Route path="application-status" element={<ApplicationStatus />} />
-
-            <Route path="exam-instructions" element={<ExamInstructions />} />
-            <Route path="exam" element={<Exam />} />
-            <Route path="exam-result" element={<ExamResult />} />
 
             <Route path="cohort" element={<MyCohort />} />
             <Route path="cohorts" element={<MyCohort />} />
             <Route path="class-schedule" element={<ClassSchedule />} />
             <Route path="mentor-details" element={<MentorDetails />} />
-            <Route path="course/:id" element={<CourseDetails />} />
 
             <Route path="attendance" element={<Attendance />} />
             <Route path="attendance-history" element={<AttendanceHistory />} />
@@ -256,6 +259,7 @@ function AppRoutes() {
 
             {/* Applications */}
             <Route path="applications" element={<Applications />} />
+            <Route path="applications/:id" element={<ApplicationDetails />} />
             <Route path="application-details/:id" element={<ApplicationDetails />} />
             <Route path="approve-application/:id" element={<ApproveApplication />} />
             <Route path="reject-application/:id" element={<RejectApplication />} />

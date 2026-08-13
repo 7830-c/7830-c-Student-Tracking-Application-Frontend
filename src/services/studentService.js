@@ -4,10 +4,10 @@ import { API_ENDPOINTS } from "../constants/apiEndpoints";
 const PROFILE_STORAGE_KEY_PREFIX = "sure_student_profile_";
 
 const normalizeProfile = (profile = {}) => ({
-  firstName: profile.firstName || profile.first_name || "",
-  lastName: profile.lastName || profile.last_name || "",
-  email: profile.email || "",
-  phoneNumber: profile.phoneNumber || profile.phone_number || "",
+  firstName: profile.firstName || profile.first_name || (profile.user?.first_name) || "",
+  lastName: profile.lastName || profile.last_name || (profile.user?.last_name) || "",
+  email: profile.email || (profile.user?.email) || "",
+  phoneNumber: profile.phoneNumber || profile.phone_number || (profile.user?.phone_number) || "",
   dob: profile.dob || "",
   gender: profile.gender || "",
   collegeName: profile.collegeName || profile.college || "",
@@ -23,32 +23,31 @@ const normalizeProfile = (profile = {}) => ({
   state: profile.state || "",
   pincode: profile.pincode || "",
   technicalSkills: profile.technicalSkills || profile.tagline || "",
-  // Existing student fields (Single courseBatch like G2-26)
-  isExistingStudent: profile.isExistingStudent || "no",
+  isExistingStudent: profile.isExistingStudent || (profile.is_existing_student ? "yes" : "no"),
   domain: profile.domain || "",
   courseBatch: profile.courseBatch || profile.course_batch || "",
 });
 
 export const isProfileComplete = (profile = {}) => {
+  if (!profile) return false;
   const normalized = normalizeProfile(profile);
 
-  return Boolean(
-    normalized.firstName &&
-      normalized.lastName &&
-      normalized.email &&
-      normalized.phoneNumber &&
-      normalized.collegeName &&
-      normalized.degree &&
-      normalized.branch &&
-      normalized.graduationYear
+  // Consider profile complete if email exists, name exists, and at least college or phone or degree is filled
+  const hasIdentity = Boolean(normalized.email || normalized.firstName);
+  const hasDetails = Boolean(
+    normalized.collegeName ||
+      normalized.phoneNumber ||
+      normalized.degree ||
+      normalized.branch ||
+      profile.id
   );
+
+  return Boolean(hasIdentity && hasDetails);
 };
 
 export const studentService = {
-  // ─── Utility Methods ──────────────────────────────────────────
   isProfileComplete,
 
-  // ─── Backend API Methods ──────────────────────────────────────
   async getStudentProfiles(params = {}) {
     const response = await apiClient.get(API_ENDPOINTS.STUDENTS.BASE, { params });
     return response.data;
@@ -78,14 +77,7 @@ export const studentService = {
     const response = await apiClient.delete(API_ENDPOINTS.STUDENTS.BY_ID(id));
     return response.data;
   },
-  
-  
-  // ─── Profile Methods (Backend-First with localStorage Fallback) ──
 
-  /**
-   * Register a new student profile.
-   * Tries the backend API first; falls back to localStorage if backend is unreachable.
-   */
   async registerStudentProfile(signupData) {
     const { firstName, lastName, email, phoneNumber } = signupData;
     const cleanEmail = (email || "").trim().toLowerCase();
@@ -118,10 +110,6 @@ export const studentService = {
     }
   },
 
-  /**
-   * Get a student profile.
-   * Tries localStorage first (for speed), then backend API.
-   */
   async getProfile(email) {
     if (!email) return null;
     const cleanEmail = email.trim().toLowerCase();
@@ -129,13 +117,14 @@ export const studentService = {
 
     try {
       const response = await apiClient.get(API_ENDPOINTS.STUDENTS.BASE);
-      const students = Array.isArray(response.data) ? response.data : [response.data];
+      const resData = response.data;
+      const students = Array.isArray(resData) ? resData : (resData?.results || [resData]);
       const profile = students.find((item) => {
         const user = item.user || {};
         return (user.email || "").toLowerCase() === cleanEmail || (item.email || "").toLowerCase() === cleanEmail;
       }) || students[0];
 
-      if (profile) {
+      if (profile && profile.id) {
         const user = profile.user || {};
         const mapped = normalizeProfile({
           ...profile,
@@ -148,7 +137,6 @@ export const studentService = {
           graduationYear: profile.graduation_year || profile.graduationYear || "",
           address: profile.bio || profile.address || "",
           technicalSkills: profile.tagline || profile.technicalSkills || "",
-          // Map existing student fields
           isExistingStudent: profile.is_existing_student ? "yes" : profile.isExistingStudent || "no",
           domain: profile.domain || "",
           courseBatch: profile.course_batch || profile.courseBatch || "",
@@ -172,10 +160,6 @@ export const studentService = {
     return null;
   },
 
-  /**
-   * Save/update a student profile.
-   * Saves to localStorage and tries to sync to backend API.
-   */
   async saveProfile(email, profileData) {
     if (!email) return null;
     const cleanEmail = email.trim().toLowerCase();
@@ -191,44 +175,46 @@ export const studentService = {
       phoneNumber: profileData.phoneNumber || existing.phoneNumber || "",
     };
 
-    // Save to local storage but omit the File object to prevent JSON circular errors
     const storageCopy = { ...updated, offerLetter: null };
     localStorage.setItem(key, JSON.stringify(storageCopy));
 
     try {
       const profileResponse = await apiClient.get(API_ENDPOINTS.STUDENTS.BASE);
-      const students = Array.isArray(profileResponse.data) ? profileResponse.data : [profileResponse.data];
-      const backendProfile = students[0];
+      const resData = profileResponse.data;
+      const students = Array.isArray(resData) ? resData : (resData?.results || [resData]);
+      const backendProfile = students.find((p) => p && p.id) || (students[0]?.id ? students[0] : null);
 
-      // Use FormData instead of JSON payload to support Offer Letter file uploads
       const formData = new FormData();
       formData.append("college", updated.collegeName || "");
       formData.append("degree", updated.degree || "");
       formData.append("specialization", updated.branch || "");
-      if (updated.graduationYear) {
+      if (updated.graduationYear && !isNaN(Number(updated.graduationYear))) {
         formData.append("graduation_year", Number(updated.graduationYear));
       }
       formData.append("city", updated.city || "");
       formData.append("state", updated.state || "");
       formData.append("bio", updated.address || "");
       formData.append("tagline", updated.technicalSkills || "");
-      
-      // Verification Fields
+
+      formData.append("firstName", updated.firstName || "");
+      formData.append("first_name", updated.firstName || "");
+      formData.append("lastName", updated.lastName || "");
+      formData.append("last_name", updated.lastName || "");
+      formData.append("phoneNumber", updated.phoneNumber || "");
+      formData.append("phone_number", updated.phoneNumber || "");
+
       formData.append("is_existing_student", updated.isExistingStudent === "yes");
       formData.append("domain", updated.domain || "");
-      formData.append("course_batch", updated.courseBatch || ""); // Single string like G2-26 VLSI
+      formData.append("course_batch", updated.courseBatch || "");
 
-      // 🚨 CRITICAL FIX: Allow frontend to force the status to Pending (NOT_AVAILABLE)
       if (updated.status) {
         formData.append("status", updated.status);
       }
 
-      // Append file if exists
-      if (profileData.offerLetter) {
-        formData.append("offer_letter", profileData.offerLetter);
+      if (profileData.offerLetter instanceof File) {
+        formData.append("uploaded_offer_letter", profileData.offerLetter);
       }
 
-      // Important: Use FormData in headers
       const config = { headers: { "Content-Type": "multipart/form-data" } };
 
       if (backendProfile?.id) {
@@ -237,17 +223,21 @@ export const studentService = {
         await apiClient.post(API_ENDPOINTS.STUDENTS.BASE, formData, config);
       }
 
-      const meResponse = await apiClient.get(API_ENDPOINTS.USERS.ME);
-      const userId = meResponse?.data?.id;
-      if (userId) {
-        await apiClient.patch(API_ENDPOINTS.USERS.BY_ID(userId), {
-          first_name: updated.firstName || "",
-          last_name: updated.lastName || "",
-          phone_number: updated.phoneNumber || "",
-        });
+      try {
+        const meResponse = await apiClient.get(API_ENDPOINTS.USERS.ME);
+        const userId = meResponse?.data?.id;
+        if (userId) {
+          await apiClient.patch(API_ENDPOINTS.USERS.BY_ID(userId), {
+            first_name: updated.firstName || "",
+            last_name: updated.lastName || "",
+            phone_number: updated.phoneNumber || "",
+          });
+        }
+      } catch (e) {
+        console.warn("Optional User me endpoint update warning:", e);
       }
     } catch (err) {
-      console.warn("Backend profile save failed:", err.message || err);
+      console.error("Backend profile save failed details:", err.response?.data || err.message || err);
       throw err;
     }
 

@@ -25,23 +25,32 @@ function EditCohort() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [cohortResponse, coursesResponse] = await Promise.all([
-          apiClient.get(API_ENDPOINTS.COHORTS.BY_ID(id)),
-          apiClient.get(API_ENDPOINTS.COURSES.BASE),
-        ]);
+        let cohort = null;
+        try {
+          const cohortResponse = await apiClient.get(API_ENDPOINTS.COHORTS.BY_ID(id));
+          if (cohortResponse?.data?.id) cohort = cohortResponse.data;
+        } catch (e) {
+          const localCohorts = JSON.parse(localStorage.getItem("sure_local_cohorts") || "[]");
+          cohort = localCohorts.find((c) => String(c.id) === String(id) || String(c.code).toLowerCase() === String(id).toLowerCase());
+        }
 
-        const cohort = cohortResponse.data || {};
-        setCourses(normalizeListResponse(coursesResponse.data));
-        setForm({
-          code: cohort.code || "",
-          name: cohort.name || "",
-          course: cohort.course?.id || cohort.course || "",
-          start_date: cohort.start_date || "",
-          end_date: cohort.end_date || "",
-          max_students: cohort.max_students || 30,
-          status: cohort.status || "DRAFT",
-          meeting_link: cohort.meeting_link || "",
-        });
+        const coursesResponse = await apiClient.get(API_ENDPOINTS.COURSES.BASE).catch(() => null);
+        setCourses(normalizeListResponse(coursesResponse?.data));
+
+        if (cohort) {
+          setForm({
+            code: cohort.code || "",
+            name: cohort.name || "",
+            course: cohort.course?.id || cohort.course || "",
+            start_date: cohort.start_date || "",
+            end_date: cohort.end_date || "",
+            max_students: cohort.max_students || 30,
+            status: cohort.status || "DRAFT",
+            meeting_link: cohort.meeting_link || "",
+          });
+        } else {
+          setError("Cohort not found.");
+        }
       } catch (err) {
         console.error("Failed to load cohort data:", err);
         setError("Unable to load cohort details.");
@@ -65,19 +74,29 @@ function EditCohort() {
     setError("");
     setLoading(true);
 
-    try {
-      const payload = {
-        code: form.code.trim(),
-        name: form.name.trim(),
-        course: form.course,
-        start_date: form.start_date,
-        end_date: form.end_date,
-        max_students: Number(form.max_students) || 30,
-        status: form.status,
-        meeting_link: form.meeting_link.trim() || null,
-      };
+    const payload = {
+      code: form.code.trim(),
+      name: form.name.trim(),
+      course: form.course,
+      start_date: form.start_date,
+      end_date: form.end_date,
+      max_students: Number(form.max_students) || 30,
+      status: form.status,
+      meeting_link: form.meeting_link.trim() || null,
+    };
 
-      await apiClient.patch(API_ENDPOINTS.COHORTS.BY_ID(id), payload);
+    try {
+      await apiClient.patch(API_ENDPOINTS.COHORTS.BY_ID(id), payload).catch(() => null);
+
+      // Also update local storage
+      const localCohorts = JSON.parse(localStorage.getItem("sure_local_cohorts") || "[]");
+      const updatedLocal = localCohorts.map((c) =>
+        (String(c.id) === String(id) || String(c.code).toLowerCase() === String(id).toLowerCase())
+          ? { ...c, ...payload }
+          : c
+      );
+      localStorage.setItem("sure_local_cohorts", JSON.stringify(updatedLocal));
+
       navigate("/admin/cohorts");
     } catch (err) {
       const message = err?.response?.data?.detail || "Unable to update the cohort.";

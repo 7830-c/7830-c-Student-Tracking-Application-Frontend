@@ -58,36 +58,18 @@ function CourseDetails() {
     if (!course?.id || applying) return;
     setApplying(true);
 
-    const appliedSet = new Set(JSON.parse(localStorage.getItem("sure_applied_course_ids") || "[]"));
-    appliedSet.add(course.id);
-    localStorage.setItem("sure_applied_course_ids", JSON.stringify(Array.from(appliedSet)));
-
-    // Create persistent application record in localStorage for instant synchronization
-    const localApps = JSON.parse(localStorage.getItem("sure_student_applications") || "[]");
-    const newAppRecord = {
-      id: `APP-${Date.now().toString(36).toUpperCase()}`,
-      application_number: `APP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-      course_id: course.id,
-      course_name: course.name,
-      course_display: course.name,
-      status: "APPLIED",
-      applied_at: new Date().toISOString(),
-    };
-    if (!localApps.some((a) => a.course_id === course.id)) {
-      localApps.push(newAppRecord);
-      localStorage.setItem("sure_student_applications", JSON.stringify(localApps));
-    }
-
     try {
       await apiClient.post(API_ENDPOINTS.APPLICATIONS.BASE, {
-        course: course.id,
         course_id: course.id,
       });
+
+      navigate("/student/application-success", { state: { course } });
     } catch (err) {
-      console.warn("Application creation API notice:", err.response?.data || err.message);
+      console.warn("Application creation info:", err.response?.data || err.message);
+      // Even if already applied, navigate to application success / instructions
+      navigate("/student/application-success", { state: { course } });
     } finally {
       setApplying(false);
-      navigate("/student/application-success", { state: { course } });
     }
   };
 
@@ -101,6 +83,7 @@ function CourseDetails() {
         ) : (
           <>
             <h1>{course.name}</h1>
+
             <p className={styles.description}>{course.description || "No description available."}</p>
 
             <div className={styles.infoGrid}>
@@ -116,7 +99,7 @@ function CourseDetails() {
 
               <div>
                 <h3>Duration</h3>
-                <p>{course.duration_weeks ? `${course.duration_weeks} Weeks` : "24 Weeks"}</p>
+                <p>{course.duration_weeks ? `${course.duration_weeks} Weeks` : "N/A"}</p>
               </div>
 
               <div>
@@ -154,7 +137,7 @@ function CourseDetails() {
           onClick={handleApplyCourse}
           disabled={applying || loading || !course}
         >
-          {applying ? "Submitting Application..." : "Apply for this Course Track"}
+          {applying ? "Submitting Application..." : "Apply for this Course"}
         </button>
       </div>
     </div>
